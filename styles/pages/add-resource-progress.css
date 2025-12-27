@@ -1,0 +1,214 @@
+/* 添加资源页面进度样式 */
+    .add-progress {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .progress-detail {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+        padding: 8px 10px;
+        font-size: 12px;
+        color: #ccc;
+        font-family: monospace;
+        max-height: 100px;
+        overflow-y: auto;
+    }
+
+    /* 单选按钮样式优化 */
+    .input-group label input[type="radio"] {
+        margin-right: 5px;
+    }
+
+    .input-group label {
+        cursor: pointer;
+        padding: 5px 0;
+    }
+
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 20px 15px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+    }
+
+    /* 添加资源页面确保可点击 */
+    #add-creator-page .form-container,
+    #add-creator-page .input-group,
+    #add-creator-page .submit-btn,
+    #dy-profile-url,
+    #creator-url-input,
+    input[name="add-method"] {
+        pointer-events: auto !important;
+    }
+
+
+    /* --- 统一列表视图样式 (Universal List Item) --- */
+    .uni-list-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        /* 半透明背景 */
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: background 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .uni-list-item:active {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* 左侧封面 */
+    .uni-thumb {
+        width: 90px;
+        height: 120px;
+        /* 统一 3:4 比例 */
+        border-radius: 6px;
+        overflow: hidden;
+        background: #222;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .uni-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* 类型角标 (视频/图集) */
+    .uni-type-badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: rgba(0, 0, 0, 0.6);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+        color: #fff;
+        font-size: 10px;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-weight: bold;
+    }
+
+    /* 右侧信息区 */
+    .uni-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        padding: 2px 0;
+    }
+
+    .uni-title {
+        font-size: 14px;
+        color: #fff;
+        line-height: 1.4;
+        max-height: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+
+    /* 辅助信息行 (音乐/作者) */
+    .uni-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: #888;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .uni-meta-row i {
+        width: 14px;
+        /* 固定图标宽度对齐 */
+        text-align: center;
+        color: #666;
+    }
+
+    /* 音乐行特有样式 */
+    .uni-meta-row.music i {
+        color: var(--theme-color);
+    }
+
+    /* 作者头像 */
+    .uni-avatar-xs {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #333;
+        object-fit: cover;
+    }
+
+    /* 底部数据统计行 */
+    .uni-stats-row {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 4px;
+        font-size: 12px;
+        color: #aaa;
+    }
+
+    .uni-stat-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .uni-stat-item i.liked {
+        color: #ff4d4f;
+        animation: fa-bounce 0.5s;
+    }
+
+    /* 资源管理页：作品删除角标 */
+    .rm-delete-badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 24px;
+        height: 24px;
+        background: rgba(255, 77, 79, 0.9);
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        z-index: 5;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .rm-delete-badge:active {
+        transform: scale(0.9);
+        background: #ff4d4f;
+    }

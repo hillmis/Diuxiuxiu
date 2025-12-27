@@ -1,0 +1,73 @@
+/* 主页面合适位置 */
+        background: rgba(0, 0, 0, 0.3);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 5px 12px;
+        display: none;
+        /* 默认隐藏 */
+        align-items: center;
+        gap: 6px;
+        z-index: 90;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        animation: float-in 0.3s ease-out;
+    }
+
+    @keyframes float-in {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .df-icon {
+        color: var(--theme-color);
+        font-size: 14px;
+        animation: bounce 1s infinite;
+    }
+
+    .df-text {
+        font-size: 12px;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .df-badge {
+        background: #ff4d4f;
+        color: #fff;
+        font-size: 10px;
+        padding: 0 4px;
+        border-radius: 4px;
+        height: 14px;
+        line-height: 14px;
+    }
+
+    @keyframes bounce {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-3px);
+        }
+    }
+
+    /* 账号相关微调 */
+    .account-info-box {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }

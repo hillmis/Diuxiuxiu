@@ -1,0 +1,56 @@
+/* 1. 通用页面容器 (右侧滑入的页面：个人主页、设置、添加资源等) */
+    .page-layer {
+        background: rgba(18, 18, 18, 0.7) !important;
+        /* 深灰色半透明 */
+        backdrop-filter: blur(20px);
+        /* 背景模糊 */
+        -webkit-backdrop-filter: blur(20px);
+        /* 兼容 iOS */
+
+    }
+
+    /* 2. 左侧侧边栏 (资源列表) */
+    .page-layer.left-side {
+        background: rgba(10, 10, 10, 0.7) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+        /* 边框变淡 */
+    }
+
+
+
+    /* 4. 下载/分享 Sheet */
+    .modal-sheet {
+        background: rgba(18, 18, 18, 0.7) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+
+    /* =========================================
+           内部元素透明化 (去除遮挡毛玻璃的实色背景)
+           ========================================= */
+
+    /* 通用头部 - 去除实色背景，改为透明 */
+    .common-header,
+    .comment-header,
+    .sheet-header,
+    #profile-page .page-header-container,
+    .view-switch,
+    .view-actions {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        /* 分割线变淡 */
+    }
+
+    /* 评论区内部 */
+    .comment-context,
+    .comment-input-bar {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .c-input {
+        background: rgba(255, 255, 255, 0.1) !important;
+        /* 输入框半透明 */
+    }

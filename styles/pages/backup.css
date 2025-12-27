@@ -1,0 +1,639 @@
+/* --- 备份页面样式 --- */
+    .backup-status-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .bs-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(92, 201, 255, 0.2);
+        color: #5cc9ff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+    }
+
+    .bs-info {
+        flex: 1;
+    }
+
+    .bs-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .bs-desc {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .bs-btn {
+        background: var(--theme-color);
+        color: #fff;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    /* 数据范围选择网格 */
+    .backup-options-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .bo-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 10px 5px;
+        text-align: center;
+        font-size: 12px;
+        color: #888;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .bo-item i {
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
+    .bo-item.active {
+        background: rgba(92, 201, 255, 0.15);
+        border-color: #5cc9ff;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    /* 智能同步大卡片 */
+    .sync-card {
+        background: linear-gradient(90deg, var(--theme-color), #b388eb);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #fff;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 15px rgba(92, 201, 255, 0.3);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sync-card:active {
+        transform: scale(0.98);
+    }
+
+    .sc-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .sc-desc {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    .sc-icon {
+        font-size: 28px;
+        opacity: 0.8;
+    }
+
+    /* 2x2 操作网格 */
+    .backup-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .backup-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .backup-card:active {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .bc-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .bc-icon.color-blue {
+        background: rgba(92, 201, 255, 0.15);
+        color: #5cc9ff;
+    }
+
+    .bc-icon.color-green {
+        background: rgba(100, 220, 200, 0.15);
+        color: #64dcc8;
+    }
+
+    .bc-icon.color-purple {
+        background: rgba(179, 136, 235, 0.15);
+        color: #b388eb;
+    }
+
+    .bc-icon.color-orange {
+        background: rgba(255, 173, 129, 0.15);
+        color: #ffad81;
+    }
+
+    .bc-name {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* 历史记录/快照列表 */
+    .backup-history-list {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 5px 0;
+        margin-bottom: 15px;
+    }
+
+    .bh-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .bh-item:last-child {
+        border-bottom: none;
+    }
+
+    .bh-content {
+        flex: 1;
+    }
+
+    .bh-action {
+        font-size: 14px;
+        color: #ddd;
+        margin-bottom: 2px;
+    }
+
+    .bh-time {
+        font-size: 11px;
+        color: #666;
+    }
+
+    .bh-status {
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .bh-status.success {
+        color: #52c41a;
+    }
+
+    .bh-status.fail {
+        color: #ff4d4f;
+    }
+
+    /* 旋转动画 */
+    .fa-spin-fast {
+        animation: fa-spin 0.8s infinite linear;
+    }
+
+    /* --- 聊天室专用样式 --- */
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 广告横幅 */
+    .chat-banner {
+        width: 100%;
+        height: 60px;
+        background: rgba(0, 0, 0, 0.5);
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+        display: none;
+        /* 默认隐藏，JS控制 */
+        cursor: pointer;
+    }
+
+    .chat-banner img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .chat-banner .ad-tag {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        font-size: 10px;
+        padding: 2px 4px;
+        border-radius: 4px;
+        z-index: 2;
+    }
+
+    /* 消息列表 */
+    .chat-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* 消息项 */
+    .chat-msg-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        max-width: 85%;
+        position: relative;
+    }
+
+    .chat-msg-item.self {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+
+    /* 引用消息 */
+    .chat-quote {
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 3px solid var(--theme-color);
+        padding: 6px 10px;
+        margin-bottom: 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #aaa;
+    }
+
+    .chat-quote .quote-user {
+        color: var(--theme-color);
+        font-weight: bold;
+    }
+
+    .chat-quote .quote-content {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* 头像区域 */
+    .chat-avatar-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 40px;
+        position: relative;
+    }
+
+    .chat-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        object-fit: cover;
+        cursor: pointer;
+    }
+
+    /* 徽章系统 */
+    .role-badge {
+        font-size: 10px;
+        font-weight: bold;
+        margin-bottom: 2px;
+        color: #888;
+        white-space: nowrap;
+    }
+
+    .role-badge.admin {
+        color: #5cc9ff;
+        text-shadow: 0 0 5px rgba(92, 201, 255, 0.5);
+    }
+
+    .role-badge.super {
+        color: #b388eb;
+    }
+
+    .vip-badge {
+        font-size: 10px;
+        font-weight: bold;
+        margin-bottom: 2px;
+        color: #ffd700;
+        text-shadow: 0 0 3px rgba(255, 215, 0, 0.5);
+        white-space: nowrap;
+    }
+
+    /* 气泡 */
+    .chat-bubble {
+        background: rgba(255, 255, 255, 0.1);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        padding: 8px 12px;
+        border-radius: 0 12px 12px 12px;
+        color: #fff;
+        font-size: 14px;
+        line-height: 1.5;
+        position: relative;
+        word-break: break-all;
+        max-width: 100%;
+    }
+
+    .chat-msg-item.self .chat-bubble {
+        background: var(--grad-teal);
+        border-radius: 12px 0 12px 12px;
+        color: #000;
+    }
+
+    .chat-username {
+        font-size: 11px;
+        color: #aaa;
+        margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .chat-msg-item.self .chat-username {
+        justify-content: flex-end;
+    }
+
+    /* 等级标签 */
+    .level-tag {
+        background: #333;
+        color: #fff;
+        padding: 0 4px;
+        border-radius: 4px;
+        font-size: 9px;
+        transform: scale(0.9);
+    }
+
+    /* 消息时间 */
+    .msg-time {
+        font-size: 10px;
+        color: #888;
+        margin-top: 2px;
+        text-align: right;
+    }
+
+    .chat-msg-item.self .msg-time {
+        text-align: left;
+    }
+
+    /* 输入栏修复 */
+    .comment-input-bar {
+        position: relative !important;
+        padding: 10px 15px;
+        background: rgba(0, 0, 0, 0.3);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* 输入框 */
+    .c-input {
+        flex: 1;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        color: #fff;
+        font-size: 14px;
+    }
+
+    .c-input:focus {
+        outline: none;
+        border-color: var(--theme-color);
+    }
+
+    /* 表情包区域 */
+    .emoji-picker {
+        position: absolute;
+        bottom: 50px;
+        right: 10px;
+        width: 250px;
+        height: 200px;
+        background: #222;
+        border: 1px solid #444;
+        border-radius: 10px;
+        display: none;
+        z-index: 1000;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .emoji-picker.active {
+        display: block;
+    }
+
+    .emoji-grid {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 5px;
+    }
+
+    .emoji-item {
+        font-size: 20px;
+        cursor: pointer;
+        text-align: center;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .emoji-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* 封禁状态 */
+    .banned-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #ff4d4f;
+        font-weight: bold;
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+    }
+
+    /* 登录/注册弹窗 */
+    .auth-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 300px;
+        background: #222;
+        padding: 20px;
+        border-radius: 12px;
+        z-index: 200;
+        border: 1px solid #444;
+        display: none;
+    }
+
+    .auth-modal.active {
+        display: block;
+    }
+
+    .overlay-mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 199;
+        display: none;
+    }
+
+    .overlay-mask.active {
+        display: block;
+    }
+
+    /* 长按菜单修复 */
+    .context-menu {
+        position: fixed;
+        background: #333;
+        border: 1px solid #555;
+        border-radius: 8px;
+        z-index: 9999;
+        padding: 5px 0;
+        min-width: 150px;
+        display: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .context-item {
+        padding: 10px 15px;
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .context-item:hover {
+        background: #444;
+    }
+
+    .context-item.disabled {
+        color: #666;
+        cursor: not-allowed;
+    }
+
+    /* 消息操作菜单 */
+    .msg-context-menu {
+        position: fixed;
+        background: #333;
+        border: 1px solid #555;
+        border-radius: 8px;
+        z-index: 9999;
+        padding: 5px 0;
+        min-width: 120px;
+        display: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 图片消息 */
+    .chat-img-msg {
+        max-width: 150px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    /* 发送按钮 */
+    .c-btn {
+        padding: 8px 15px;
+        background: var(--theme-color);
+        color: #000;
+        border: none;
+        border-radius: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .c-btn:hover {
+        opacity: 0.9;
+    }
+
+    /* 修复侧边栏点击问题 */
+    .page-layer.left-side {
+        z-index: 100 !important;
+        /* 确保在评论区之上 */
+        pointer-events: auto !important;
+    }
+
+
+    /* 确保侧边栏内容可点击 */
+    .sidebar-container,
+    .mixed-recommend-card,
+    .creator-item,
+    .c-avatar-box,
+    .c-name {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+    }
+
+    /* 修复毛玻璃效果导致的变暗问题 */
+    .page-layer.left-side.active {
+        background: rgba(10, 10, 10, 0.95) !important;
+        /* 更实一点的背景 */
+        backdrop-filter: blur(10px);
+        /* 减少模糊强度 */
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* 确保遮罩不会影响侧边栏 */
+    #global-mask {
+        z-index: 99 !important;
+        /* 在侧边栏之下 */
+    }

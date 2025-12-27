@@ -1,0 +1,335 @@
+/* --- 我的页面样式 --- */
+    .my-profile-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px;
+        color: white;
+        margin: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .my-profile-content {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 20px;
+
+    }
+
+    .my-avatar-container {
+        position: relative;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+
+    .my-avatar-container img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .my-avatar-container img:hover {
+        transform: scale(1.05);
+    }
+
+    .edit-profile-btn {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #764ba2;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 12px;
+        border: 2px solid #764ba2;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .edit-profile-btn:hover {
+        background-color: white;
+        transform: scale(1.1);
+    }
+
+    .my-info-text {
+        text-align: left;
+        flex: 1;
+    }
+
+    .my-nickname {
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .my-id {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.4;
+    }
+
+    .my-stats-row {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .stat-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 0 20px;
+        position: relative;
+
+    }
+
+    .stat-box:not(:last-child):after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 40px;
+        width: 1px;
+    }
+
+    .stat-box span {
+        color: white;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-box label {
+        color: rgba(255, 255, 255, 0.63);
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    /* --- 我的页面：列表样式 --- */
+    .my-list-container {
+        padding: 15px;
+        padding-bottom: 80px;
+    }
+
+    /* 通用列表项 */
+    .my-list-item {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+
+    .my-list-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* 音乐项 */
+    .music-item-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        margin-right: 15px;
+        font-size: 20px;
+        flex-shrink: 0;
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .item-info {
+        flex: 1;
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    .item-title {
+        font-size: 16px;
+        color: white;
+        margin-bottom: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+    }
+
+    .item-sub {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.7);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .item-action-btn {
+        padding: 8px 12px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 10px;
+        flex-shrink: 0;
+    }
+
+    .item-action-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    /* 下载记录项 */
+    .download-item-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 15px;
+        font-size: 18px;
+        color: white;
+        flex-shrink: 0;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .download-type-video {
+        background: linear-gradient(135deg, #722ed1 0%, #531dab 100%);
+    }
+
+    .download-type-image {
+        background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    }
+
+    .download-type-music {
+        background: linear-gradient(135deg, #eb2f96 0%, #c41d7f 100%);
+    }
+
+    .download-type-zip {
+        background: linear-gradient(135deg, #fa8c16 0%, #d46b08 100%);
+    }
+
+    .dl-time {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .dl-time i {
+        font-size: 10px;
+    }
+
+    /* 空状态提示 */
+    #my-empty-tip {
+        text-align: center;
+        padding: 60px 20px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    #my-empty-tip i {
+        font-size: 48px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    #my-empty-tip div {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* 选项卡样式 */
+    .view-switch {
+        display: flex;
+        background: #121212;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0 15px;
+        margin: 0 15px;
+    }
+
+    .view-btn {
+        flex: 1;
+        text-align: center;
+        padding: 18px 0;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        border-bottom: 3px solid transparent;
+    }
+
+    .view-btn:hover {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .view-btn.active {
+        color: white;
+        border-bottom: 3px solid #667eea;
+    }
+
+    .view-btn.active:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.1);
+        animation: ripple 0.6s ease-out;
+    }
+
+    @keyframes ripple {
+        0% {
+            width: 0;
+            height: 0;
+            opacity: 1;
+        }
+
+        100% {
+            width: 60px;
+            height: 60px;
+            opacity: 0;
+        }
+    }

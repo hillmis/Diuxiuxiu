@@ -1,0 +1,101 @@
+/* --- 导入页面美化 --- */
+    .import-method-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.2s;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* 选中状态映射颜色 */
+    .import-method-card.active-net {
+        background: rgba(92, 201, 255, 0.15);
+        border-color: #5cc9ff;
+    }
+
+    .import-method-card.active-local {
+        background: rgba(100, 220, 200, 0.15);
+        border-color: #64dcc8;
+    }
+
+    .import-radio-circle {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        position: relative;
+    }
+
+    .import-method-card.active-net .import-radio-circle {
+        border-color: #5cc9ff;
+    }
+
+    .import-method-card.active-net .import-radio-circle::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 8px;
+        height: 8px;
+        background: #5cc9ff;
+        border-radius: 50%;
+    }
+
+    .import-method-card.active-local .import-radio-circle {
+        border-color: #64dcc8;
+    }
+
+    .import-method-card.active-local .import-radio-circle::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 8px;
+        height: 8px;
+        background: #64dcc8;
+        border-radius: 50%;
+    }
+
+    .im-icon {
+        font-size: 20px;
+        width: 30px;
+        text-align: center;
+    }
+
+    .im-text {
+        flex: 1;
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    /* --- 文本展示页 (协议/关于) 样式 --- */
+    .text-content-scroll {
+        height: calc(100% - 60px);
+        overflow-y: auto;
+        padding: 20px;
+        background: #121212;
+    }
+
+    .text-body {
+        color: #ddd;
+        font-size: 14px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        /* 保持换行 */
+    }
+
+    .text-body h3 {
+        color: #fff;
+        margin: 20px 0 10px 0;
+        font-size: 18px;
+    }
+
+    .text-body ul {
+        padding-left: 20px;
+        margin-bottom: 10px;
+    }

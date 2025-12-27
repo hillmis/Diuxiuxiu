@@ -1,0 +1,244 @@
+/* 页面切换动画 */
+    .works-container {
+        background: #000;
+        overflow-y: auto;
+        min-height: calc(100vh - 300px);
+    }
+
+    .works-grid,
+    .my-list-container {
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 480px) {
+        .my-profile-header {
+            margin: 10px;
+            padding: 15px;
+        }
+
+        .my-avatar-container img {
+            width: 70px;
+            height: 70px;
+        }
+
+        .my-nickname {
+            font-size: 20px;
+        }
+
+        .my-id {
+            font-size: 13px;
+        }
+
+        .stat-box span {
+            font-size: 20px;
+        }
+
+        .stat-box label {
+            font-size: 12px;
+        }
+
+        .view-switch {
+            margin: 0 10px;
+        }
+
+        .view-btn {
+            padding: 15px 0;
+            font-size: 14px;
+        }
+
+        .my-list-item {
+            padding: 12px;
+        }
+
+        .music-item-icon,
+        .download-item-icon {
+            width: 45px;
+            height: 45px;
+            margin-right: 12px;
+        }
+    }
+
+    /* --- 任务2 & 5：优化页面动画 (移除侧滑，改为缩放+透明度，更轻快) --- */
+    .page-layer,
+    .modal-sheet,
+    .comment-layer {
+        /* 覆盖原有的 transform: translateX/Y */
+        transform: scale(0.95);
+        opacity: 0;
+        visibility: hidden;
+        /* 使用 visibility 替代 display 以支持动画 */
+        transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+            opacity 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+            visibility 0.25s;
+        will-change: transform, opacity;
+    }
+
+    .page-layer.left-side {
+        transform: scale(0.95);
+        /* 侧边栏也改为缩放效果，保持一致性 */
+    }
+
+    /* 激活状态 */
+    .page-layer.active,
+    .modal-sheet.active,
+    .comment-layer.active {
+        transform: scale(1);
+        opacity: 1;
+        visibility: visible;
+    }
+
+
+
+    /* --- 任务12：修复小弹窗输入框无法点击的问题 --- */
+
+    /* 1. 移除全局的 pointer-events: auto !important */
+    input,
+    textarea,
+    .token-input,
+    .custom-input,
+    .c-input {
+        /* 保持文本可选中 */
+        user-select: text !important;
+        -webkit-user-select: text !important;
+
+        /* 【关键修改】移除 pointer-events: auto !important; */
+        /* 让输入框遵循父容器的点击状态 (父容器隐藏时，输入框也应不可点) */
+        pointer-events: auto;
+    }
+
+    /* 2. 确保弹窗在激活时，整体可点击 (这部分原有代码应该已有，这里加强一下) */
+    .token-modal.active,
+    .page-layer.active,
+    .modal-sheet.active {
+        pointer-events: auto !important;
+    }
+
+    /* 3. 确保弹窗在隐藏时，整体不可点击 */
+    .token-modal,
+    .page-layer,
+    .modal-sheet {
+        /* 默认不可点击，防止穿透 */
+        pointer-events: none;
+    }
+
+    /* --- 播放页文案行内时间标签 --- */
+    .release-time-tag {
+        display: inline-block;
+        /* 改为 inline-block 以便在行内显示 */
+        font-size: 11px;
+        color: rgba(255, 255, 255);
+        margin: 0 6px;
+        vertical-align: 1px;
+    }
+
+    .release-time-tag i {
+        font-size: 10px;
+        margin-right: 2px;
+    }
+
+
+    /* --- 博主主页置顶标签 (网格视图左上角) --- */
+    .top-badge-pin {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        background: #face15;
+        color: #000;
+        padding: 1px 4px;
+        border-radius: 2px;
+        font-size: 10px;
+        font-weight: 700;
+        z-index: 5;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* --- 聊天室链接样式 --- */
+    .chat-bubble a {
+        color: #5cc9ff !important;
+        /* 强制主题蓝 */
+        text-decoration: underline;
+        word-break: break-all;
+        /* 强制长链接换行，防止撑破气泡 */
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .chat-bubble a:active {
+        opacity: 0.7;
+    }
+
+
+    /* --- 收藏夹网格移除按钮 --- */
+    .fav-remove-btn {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        width: 24px;
+        height: 24px;
+        background: rgba(0, 0, 0, 0.6);
+        /* 半透明黑底 */
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.8);
+        z-index: 10;
+        font-size: 11px;
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .fav-remove-btn:active {
+        background: #ff4d4f;
+        /* 点击变红 */
+        color: #fff;
+        transform: scale(0.9);
+    }
+
+    /* 圈子样式补丁 */
+    .circle-header-card {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        margin: 15px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+    }
+
+
+    /* 悬浮发帖按钮 */
+    .fab-post {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: var(--theme-color);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-size: 20px;
+        box-shadow: 0 4px 15px rgba(92, 201, 255, 0.4);
+        z-index: 100;
+        cursor: pointer;
+    }

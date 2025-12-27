@@ -1,0 +1,181 @@
+/* --- 关于页面美化样式 (About Page UI) --- */
+    /* 整体缩放系数 */
+    .about-page-wrapper {
+        transform: scale(0.95);
+        transform-origin: top center;
+        width: 105%;
+        /* 补偿缩放 */
+    }
+
+    /* 1. 头部 Logo 区域 */
+    .about-header-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .about-logo-box {
+        width: 88px;
+        height: 88px;
+        border-radius: 22px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+        animation: float-logo 3s ease-in-out infinite;
+    }
+
+    .about-logo-box i {
+        font-size: 42px;
+        color: #fff;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    @keyframes float-logo {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-6px);
+        }
+    }
+
+    .about-app-name {
+        font-size: 24px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 2px;
+        margin-bottom: 4px;
+    }
+
+    .about-version-badge {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        font-family: monospace;
+    }
+
+    /* 2. 检测更新按钮 (居中胶囊) */
+    .about-update-btn {
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.1));
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: var(--theme-color);
+        padding: 12px 35px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 0 auto 35px auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
+    }
+
+    .about-update-btn:active {
+        transform: scale(0.95);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* 3. 分割标题 (对称装饰) */
+    .about-section-header {
+        text-align: center;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.4);
+        margin-bottom: 15px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .about-section-header::before,
+    .about-section-header::after {
+        content: '';
+        display: block;
+        width: 30px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* 4. 功能网格 (2列对称布局) */
+    .feature-grid-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .feature-card-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        text-align: center;
+        transition: background 0.2s;
+    }
+
+    .feature-card-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .f-icon {
+        font-size: 24px;
+        /* 不同的图标颜色 */
+    }
+
+    .f-icon.blue {
+        color: #5cc9ff;
+    }
+
+    .f-icon.purple {
+        color: #b388eb;
+    }
+
+    .f-icon.orange {
+        color: #ffad81;
+    }
+
+    .f-icon.green {
+        color: #64dcc8;
+    }
+
+    .f-title {
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .f-desc {
+        color: #666;
+        font-size: 11px;
+    }
+
+    .z-desc {
+        color: #666;
+        font-size: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    /* 5. 致谢列表 (卡片化) */
+    .credits-card-box {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 16px;
+        padding: 5px 20px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* 复用原有的 credits-item 样式，微调即可 */
+    .credits-item {
+        border-color: rgba(255, 255, 255, 0.03);
+        padding: 12px 0;
+    }

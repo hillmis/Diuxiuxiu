@@ -1,0 +1,914 @@
+/* --- 数据管理页面优化样式 --- */
+
+    /* 1. 统计卡片 */
+    .dm-stats-card {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        margin: 15px;
+        padding: 20px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .dm-chart-box {
+        width: 70px;
+        height: 70px;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .circular-chart {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        max-height: 250px;
+    }
+
+    .circle-bg {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.1);
+        stroke-width: 3;
+    }
+
+    .circle {
+        fill: none;
+        stroke-width: 3;
+        stroke-linecap: round;
+        animation: progress 1s ease-out forwards;
+        stroke: url(#gradient-color);
+    }
+
+    .dm-percentage-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        font-weight: bold;
+        color: #fff;
+    }
+
+    .dm-stats-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .dm-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+    }
+
+    .dm-label {
+        color: #888;
+    }
+
+    .dm-value {
+        font-weight: bold;
+        color: #eee;
+        font-family: monospace;
+    }
+
+    .dm-tips {
+        font-size: 10px;
+        color: #666;
+        margin-top: 5px;
+        text-align: right;
+    }
+
+    .dm-bar-bg {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        margin-top: 5px;
+        overflow: hidden;
+    }
+
+    .dm-bar-fill {
+        height: 100%;
+        background: var(--theme-color);
+        width: 0%;
+        transition: width 0.5s;
+        border-radius: 2px;
+    }
+
+    /* 2. 工具栏 (Tab + Search) */
+    .dm-toolbar {
+        padding: 0 15px 10px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .dm-tabs {
+        display: flex;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 3px;
+    }
+
+    .dm-tab {
+        padding: 6px 12px;
+        font-size: 13px;
+        color: #888;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .dm-tab.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .dm-search-box {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .dm-search-box i {
+        font-size: 12px;
+        color: #666;
+        margin-right: 5px;
+    }
+
+    .dm-search-box input {
+        background: transparent;
+        border: none;
+        color: #fff;
+        width: 100%;
+        font-size: 13px;
+    }
+
+    /* 3. 列表项优化 */
+    .dm-list-container {
+        padding: 0 15px 80px 15px;
+        /* 底部留白给按钮 */
+        height: calc(100% - 220px);
+        overflow-y: auto;
+    }
+
+    .dm-item {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid transparent;
+        transition: background 0.2s;
+    }
+
+    .dm-item:active {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* 2. 背景渐变 (左侧浓 -> 右侧淡) */
+    /* 网络订阅 (蓝色) */
+    .dm-item.source-net {
+        background: linear-gradient(to right, rgba(92, 201, 255, 0.15) 0%, rgba(92, 201, 255, 0.02) 100%) !important;
+    }
+
+    /* 收藏导出 (紫色) */
+    .dm-item.source-fav {
+        background: linear-gradient(to right, rgba(179, 136, 235, 0.15) 0%, rgba(179, 136, 235, 0.02) 100%) !important;
+    }
+
+    /* 本地导入 (青色) */
+    .dm-item.source-local {
+        background: linear-gradient(to right, rgba(100, 220, 200, 0.15) 0%, rgba(100, 220, 200, 0.02) 100%) !important;
+    }
+
+    .dm-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+    }
+
+    .dm-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .dm-icon-video {
+        background: linear-gradient(135deg, #722ed1, #b37feb);
+    }
+
+    .dm-icon-music {
+        background: linear-gradient(135deg, #f5317f, #ff7a45);
+    }
+
+    .dm-icon-image {
+        background: linear-gradient(135deg, #1890ff, #36cfc9);
+    }
+
+    .dm-icon-zip {
+        background: linear-gradient(135deg, #fa8c16, #ffd591);
+    }
+
+    .dm-content {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .dm-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    .dm-title {
+        font-size: 15px;
+        font-weight: 500;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: 5px;
+    }
+
+    .dm-size-tag {
+        font-size: 8px;
+        padding: 2px 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        color: #aaa;
+    }
+
+    .dm-meta {
+        font-size: 12px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .dm-badge {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 3px;
+    }
+
+    .dm-badge.green {
+        background: #52c41a;
+    }
+
+    .dm-badge.yellow {
+        background: #faad14;
+    }
+
+    .dm-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .dm-act-btn {
+        color: #888;
+        font-size: 16px;
+        padding: 5px;
+    }
+
+    .dm-act-btn.update {
+        color: var(--theme-color);
+    }
+
+    .dm-act-btn.delete {
+        color: #ff4d4f;
+    }
+
+    .dm-act-btn:active {
+        transform: scale(0.9);
+    }
+
+    /* 4. 底部固定按钮 */
+    .dm-footer-actions {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 15px 20px 20px 20px;
+        background: rgba(18, 18, 18, 0.95);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dm-action-btn {
+        width: 100%;
+        height: 44px;
+        border-radius: 22px;
+        border: none;
+        font-size: 15px;
+        font-weight: bold;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .dm-action-btn.primary {
+        background: linear-gradient(90deg, #028cd0, #4e4e4e50);
+    }
+
+    .dm-action-btn.danger {
+        background: #2a2a2a;
+        border: 1px solid #333;
+        color: #ff4d4f;
+    }
+
+    /* 旋转动画 */
+    .fa-spin-fast {
+        animation: fa-spin 1s infinite linear;
+    }
+
+    /* --- 日志查看器样式 --- */
+    .log-container {
+        flex: 1;
+        background: #000;
+        overflow-y: auto;
+        padding: 10px;
+        font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        font-size: 12px;
+        color: #eee;
+    }
+
+    .log-entry {
+        margin-bottom: 6px;
+        border-bottom: 1px solid #222;
+        padding-bottom: 4px;
+        word-break: break-all;
+        display: flex;
+        gap: 8px;
+    }
+
+    .log-meta {
+        color: #666;
+        flex-shrink: 0;
+        width: 70px;
+    }
+
+    .log-content {
+        flex: 1;
+        line-height: 1.4;
+    }
+
+    .log-level-info {
+        color: #5cc9ff;
+    }
+
+    .log-level-warn {
+        color: #faad14;
+    }
+
+    .log-level-error {
+        color: #ff4d4f;
+    }
+
+    .log-level-system {
+        color: #b37feb;
+    }
+
+    .log-footer-bar {
+        height: 50px;
+        background: #161616;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 15px;
+        border-top: 1px solid #333;
+    }
+
+    .log-action-btn {
+        background: #333;
+        color: #fff;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+
+    /* --- 禁用毛玻璃效果 (实色模式) --- */
+    body.no-glass .page-layer,
+    body.no-glass .modal-sheet,
+    body.no-glass .comment-layer,
+    body.no-glass .dm-footer-actions,
+    body.no-glass .music-pill {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background-color: #121212 !important;
+        /* 实色深黑背景 */
+        border: none !important;
+        /* 移除边框以获得更扁平的质感 */
+    }
+
+    /* 侧边栏稍亮一点 */
+    body.no-glass .page-layer.left-side {
+        background-color: #1a1a1a !important;
+    }
+
+    /* 评论区头部和设置项背景调整 */
+    body.no-glass .settings-group,
+    body.no-glass .mixed-recommend-card {
+        background-color: #222 !important;
+    }
+
+    body.no-glass .panel-header {
+        background-color: #1e1e1e !important;
+        border-bottom: 1px solid #333 !important;
+    }
+
+    /* --- 下载中心 & 任务列表 --- */
+    .task-list {
+        padding: 10px;
+    }
+
+    .task-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .task-name {
+        font-size: 14px;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 70%;
+    }
+
+    .task-status {
+        font-size: 12px;
+        color: #aaa;
+    }
+
+    .progress-track {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: var(--theme-color);
+        width: 0%;
+        transition: width 0.2s linear;
+    }
+
+    /* 状态颜色 */
+    .status-success {
+        color: #52c41a;
+    }
+
+    .status-error {
+        color: #ff4d4f;
+    }
+
+    .status-running {
+        color: var(--theme-color);
+    }
+
+    /*小弹窗*/
+    .token-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        /* 初始状态：缩放为 0.9，透明度为 0 */
+        transform: translate(-50%, -50%) scale(0.9);
+        width: 80%;
+        max-width: 320px;
+        background: #1f1f1f;
+        border-radius: 16px;
+        z-index: 1001;
+        padding: 25px;
+        /* 初始不可见 */
+        opacity: 0;
+        pointer-events: none;
+        /* 优化过渡：只针对 transform 和 opacity，避免 all 导致的闪烁 */
+        transition:
+            transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+            opacity 0.25s ease-out;
+        /* 添加 GPU 加速 */
+        will-change: transform, opacity;
+        backface-visibility: hidden;
+        perspective: 1000px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .token-modal.active {
+        /* 激活状态：缩放为 1，透明度为 1 */
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* 同时优化 mask 的过渡 */
+    #token-modal-mask {
+        transition: opacity 0.25s ease-out;
+    }
+
+    /* 如果需要更平滑的入场效果，可以添加微妙的入场动画 */
+    @keyframes modal-gentle-appear {
+        0% {
+            transform: translate(-50%, -50%) scale(0.92);
+            opacity: 0;
+        }
+
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+    }
+
+    .token-modal.active {
+        animation: modal-gentle-appear 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .token-input {
+        width: 100%;
+        background: #333;
+        border: 1px solid #444;
+        color: #fff;
+        padding: 12px;
+        border-radius: 8px;
+        margin: 15px 0;
+        text-align: center;
+        letter-spacing: 2px;
+        z-index: 9999;
+    }
+
+    /* --- 搜索页样式 --- */
+    .search-tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 0 10px;
+        margin-bottom: 20px;
+    }
+
+    .search-tag {
+        padding: 6px 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        font-size: 13px;
+        color: #ddd;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .search-tag:active {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(0.95);
+    }
+
+    .search-tag.fire {
+        color: #ff4d4f;
+        background: rgba(255, 77, 79, 0.1);
+    }
+
+    /* 增强版列表项 (包含作者、音乐信息) */
+    .search-item-list {
+        display: flex;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-bottom: 8px;
+        border: 1px solid transparent;
+    }
+
+    .search-item-list:active {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .search-thumb {
+        width: 90px;
+        height: 120px;
+        border-radius: 6px;
+        overflow: hidden;
+        background: #333;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .search-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .search-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        padding: 2px 0;
+    }
+
+    .search-title {
+        font-size: 14px;
+        color: #fff;
+        line-height: 1.4;
+        max-height: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        margin-bottom: 4px;
+    }
+
+    /* 作者行 */
+    .search-author-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #aaa;
+        margin-bottom: 4px;
+    }
+
+    .search-avatar-xs {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #ccc;
+    }
+
+    /* 音乐行 (新增) */
+    .search-music-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        color: #888;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 4px 8px;
+        border-radius: 4px;
+        width: fit-content;
+        max-width: 100%;
+        margin-bottom: 6px;
+    }
+
+    .search-music-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* 数据行 */
+    .search-stats-row {
+        font-size: 12px;
+        color: #666;
+        display: flex;
+        gap: 12px;
+    }
+
+    /* --- 搜索页：轮播图 --- */
+    .search-banner-wrapper {
+        margin: 15px 5px;
+        border-radius: 12px;
+        overflow: hidden;
+        /* 保持 2.5:1 的比例或固定高度 */
+        height: 140px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-banner-swiper {
+        width: 100%;
+        height: 100%;
+    }
+
+    .banner-slide-item {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        padding: 15px;
+    }
+
+    /* 轮播图上的文字遮罩 */
+    .banner-text-overlay {
+        width: 100%;
+        color: #fff;
+        font-weight: bold;
+        font-size: 15px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+        padding: 10px;
+        border-radius: 0 0 12px 12px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
+
+    /* 轮播分页器颜色 */
+    .search-banner-swiper .swiper-pagination-bullet-active {
+        background: var(--theme-color);
+    }
+
+    /* --- 搜索页：热榜列表 --- */
+    .hot-list-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 5px 0;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hot-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        transition: background 0.2s;
+    }
+
+    /* 3. 热榜最后一条去下划线 (Task 4) */
+    .hot-item:last-child {
+        border-bottom: none !important;
+    }
+
+    .hot-item:active {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .hot-rank {
+        width: 24px;
+        font-size: 16px;
+        font-weight: 800;
+        font-style: italic;
+        margin-right: 10px;
+        text-align: center;
+        font-family: 'DIN Alternate', sans-serif;
+    }
+
+    /* 前三名颜色 */
+    .rank-1 {
+        color: #ff4d4f;
+    }
+
+    .rank-2 {
+        color: #ff7a45;
+    }
+
+    .rank-3 {
+        color: #ffa940;
+    }
+
+    .rank-other {
+        color: #888;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: bold;
+    }
+
+    .hot-content {
+        flex: 1;
+        font-size: 14px;
+        color: #ddd;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .hot-tag {
+        font-size: 10px;
+        padding: 1px 4px;
+        border-radius: 4px;
+        margin-left: 8px;
+        font-weight: normal;
+    }
+
+    .tag-new {
+        background: rgba(82, 196, 26, 0.2);
+        color: #73d13d;
+    }
+
+    .tag-hot {
+        background: rgba(255, 77, 79, 0.2);
+        color: #ff4d4f;
+    }
+
+    .tag-爆 {
+        background: #ff4d4f;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .hot-score {
+        font-size: 11px;
+        color: #666;
+        margin-left: 10px;
+    }
+
+    /* 收藏夹列表项样式 (复用 my-list-item，微调) */
+    .fav-folder-item {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+    }
+
+    .fav-folder-item:active {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .fav-icon-box {
+        width: 50px;
+        height: 50px;
+        background: #333;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 15px;
+        color: #face15;
+        font-size: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .fav-icon-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .fav-info {
+        flex: 1;
+    }
+
+    .fav-title {
+        font-size: 15px;
+        color: #fff;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+
+    .fav-count {
+        font-size: 12px;
+        color: #888;
+    }
+
+    /* 选中状态 */
+    .fav-folder-item.selected .fav-title {
+        color: var(--theme-color);
+    }
+
+    /* --- Task 9: 下载悬浮球 --- */
+    #download-float-btn {
+        position: fixed;
+        top: 80px;
+        right: 15px;

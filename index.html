@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="referrer" content="no-referrer">
+<title>抖咻咻</title>
+
+<!-- 主CDN方案 -->
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css">
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- 备用CDN - 隐藏加载，主CDN失败时使用 -->
+<link rel="stylesheet" href="https://lib.baomitu.com/swiper/11.0.5/swiper-bundle.min.css" media="none"
+    onload="if(media=='none')media='all'" onerror="this.remove();console.warn('Swiper备用CSS加载失败')">
+
+<link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/6.4.0/css/all.min.css"
+    media="none" onload="if(media=='none')media='all'" onerror="this.remove();console.warn('FontAwesome备用CSS加载失败')">
+
+    <link rel="stylesheet" href="./styles/common.css">
+    <link rel="stylesheet" href="./styles/pages/add-resource-progress.css">
+    <link rel="stylesheet" href="./styles/pages/my-profile.css">
+    <link rel="stylesheet" href="./styles/pages/page-transitions.css">
+    <link rel="stylesheet" href="./styles/pages/settings.css">
+    <link rel="stylesheet" href="./styles/pages/import.css">
+    <link rel="stylesheet" href="./styles/pages/about.css">
+    <link rel="stylesheet" href="./styles/pages/page-shell.css">
+    <link rel="stylesheet" href="./styles/pages/data-management.css">
+    <link rel="stylesheet" href="./styles/pages/main-page.css">
+    <link rel="stylesheet" href="./styles/pages/backup.css">
+    <link rel="stylesheet" href="./styles/pages/comments.css">
+    <link rel="stylesheet" href="./styles/pages/circle-page.css">
+
+</head>
+
+<body>
+    <!-- 主播放容器 -->
+    <div class="swiper mySwiper swiper-container-vertical">
+        <div class="swiper-wrapper" id="video-list">
+            <div
+                style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;flex-direction:column;gap:10px;">
+                <div class="loader" style="display:block;transform:none;margin-bottom:30px;"></div>
+                <div style="color:#aaa;font-size:14px;text-align:center;">正在初始化数据...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局遮罩 -->
+    <div class="overlay-mask" id="global-mask"></div>
+
+    <!-- 侧边栏 (负一屏) -->
+    <div class="page-layer left-side" id="sidebar-page">
+        <div class="common-header">
+            <div class="header-title">资源</div>
+            <div class="header-right"></div>
+            <div class="header-back" onclick="app.pageManager.closeAll()"><i class="fa-solid fa-chevron-left"></i>
+            </div>
+        </div>
+        <div class="sidebar-container" id="sidebar-grid-content"></div>
+    </div>
+
+    <!-- 修改现有的添加资源页面 -->
+    <div class="page-layer" id="add-creator-page" style="z-index:102;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.backToHome()"><i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="header-title">添加资源</div>
+            <div class="header-right"></div>
+        </div>
+        <div class="form-container">
+            <!-- 新增：抖音主页链接输入 -->
+            <div class="input-group">
+                <label class="input-label">抖音主页</label>
+                <input type="text" class="custom-input" id="dy-profile-url"
+                    placeholder="粘贴抖音主页分享链接，如：https://v.douyin.com/xxxxx/">
+                <div style="font-size:12px; color:#666; margin-top:5px;">
+                    提示：在抖音App中复制博主主页的分享链接，粘贴。
+                </div>
+            </div>
+
+            <!-- 原有的JSON URL输入保留 -->
+            <div class="input-group">
+                <label class="input-label">数据源链接</label>
+                <input type="text" class="custom-input" id="creator-url-input"
+                    placeholder="输入URL地址，如：https://example.com/data.json">
+                <div style="font-size:12px; color:#666; margin-top:5px;">
+                    提示：获取json数据源链接，格式有要求。
+                </div>
+            </div>
+
+            <!-- 添加方式选择 -->
+
+            <div class="input-group">
+                <label class="input-label">添加方式</label>
+                <!-- 新的 Tab 结构 -->
+                <div class="add-method-tabs">
+                    <label class="add-method-label active" onclick="app.switchAddTab(this)">
+                        <input type="radio" name="add-method" value="dy-url" checked> 抖音主页
+                    </label>
+                    <label class="add-method-label" onclick="app.switchAddTab(this)">
+                        <input type="radio" name="add-method" value="json-url"> JSON链接
+                    </label>
+                    <label class="add-method-label" onclick="app.switchAddTab(this)">
+                        <input type="radio" name="add-method" value="import-file"> 本地文件
+                    </label>
+                </div>
+            </div>
+
+            <!-- 在 submit-btn 按钮上方添加一个隐藏的文件输入框 -->
+            <input type="file" id="import-file-input" accept=".json" style="display: none;"
+                onchange="app.handleFileSelect(this)">
+
+            <button class="submit-btn" onclick="app.addNewCreator()" id="add-creator-btn">开始添加</button>
+
+            <!-- 进度显示 -->
+            <div id="add-progress" style="display: none; margin-top: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <i class="fa-solid fa-spinner fa-spin" style="color: var(--theme-color);"></i>
+                    <span id="progress-text">正在处理...</span>
+                </div>
+                <div style="background: #222; border-radius: 8px; padding: 10px; font-size: 12px; color: #ccc;">
+                    <div id="progress-detail">初始化...</div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px; font-size:12px; color:#666; line-height:1.5;">
+                <strong>使用说明：</strong><br>
+                • <strong>抖音主页</strong>：自动从抖音主页获取作品数据<br>
+                • <strong>JSON数据源</strong>：输入已有的JSON文件地址<br>
+                • <strong>本地导入</strong>：从本地文件导入JSON数据
+            </div>
+        </div>
+    </div>
+
+    <!-- 资源主页 -->
+    <div class="page-layer" id="profile-page">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('profile-page')"><i
+                    class="fa-solid fa-chevron-left"></i></div>
+            <div class="header-title" id="profile-header-name">资源主页</div>
+            <div class="header-right">
+                <i class="fa-solid fa-share-from-square" style="color:#fff; font-size:18px; cursor:pointer;"
+                    onclick="app.shareProfile()"></i>
+            </div>
+        </div>
+        <div class="page-header-container">
+            <div class="profile-info">
+                <div class="p-avatar"><img id="profile-img" src=""></div>
+                <div class="p-details">
+                    <div class="p-name" id="profile-name"></div>
+                    <div class="p-id" id="profile-count"></div>
+                </div>
+            </div>
+        </div>
+        <div class="view-switch">
+            <div class="view-btn active" onclick="app.profileLoader.scrollToTop()">作品</div>
+            <div class="view-btn">喜欢</div>
+        </div>
+        <div class="view-actions">
+            <!-- 左侧：类型筛选 -->
+            <div class="filter-group">
+                <span class="filter-tag active" onclick="app.profileLoader.applyFilter('all', this)">全部</span>
+                <span class="filter-tag" onclick="app.profileLoader.applyFilter('video', this)">视频</span>
+                <span class="filter-tag" onclick="app.profileLoader.applyFilter('image', this)">图集</span>
+            </div>
+
+            <!-- 右侧：视图切换 -->
+            <div class="view-toggle-group">
+                <i class="fa-solid fa-border-all view-icon active" id="view-icon-grid"
+                    onclick="app.switchProfileView('grid')"></i>
+                <i class="fa-solid fa-list view-icon" id="view-icon-list" onclick="app.switchProfileView('list')"></i>
+            </div>
+        </div>
+        <div class="works-container" id="works-scroll-container">
+            <!-- 容器内部动态生成 -->
+            <div id="works-content-area"></div>
+            <div id="profile-loading-indicator"
+                style="padding:20px; text-align:center; color:#666; font-size:12px; display:none;">加载中...</div>
+        </div>
+    </div>
+
+    <!-- 评论区 -->
+    <div class="comment-layer" id="comment-layer">
+        <div class="panel-header">
+            <div class="panel-left">
+                <div class="panel-icon-btn" onclick="app.pageManager.closeComments()">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="panel-title">聊天室</div>
+            <div class="panel-right">
+                <div class="panel-icon-btn expand-toggle-btn"
+                    onclick="app.pageManager.toggleLayerFullscreen('comment-layer', this)">
+                    <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天室容器 -->
+        <div class="chat-container" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+            <!-- 广告横幅 -->
+            <div class="chat-banner" id="chat-banner" onclick="app.chat.clickAd()" style="display: none;">
+                <span class="ad-tag">广告</span>
+                <img src="" id="chat-ad-img" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+
+            <!-- 消息列表 -->
+            <div class="chat-list" id="chat-list" style="flex: 1; overflow-y: auto; padding: 15px;">
+                <div style="text-align:center;color:#666;margin-top:20px;"></div>
+            </div>
+
+            <!-- 输入栏 -->
+            <div class="comment-input-bar" style="position:relative;">
+                <div id="banned-lock" class="banned-mask" style="display:none;">
+                    <i class="fa-solid fa-lock"></i>   <span id="ban-reason-text">已被禁言</span>
+                </div>
+
+                <i class="fa-regular fa-face-smile chat-tool-btn" onclick="app.chat.toggleEmojiPicker()"
+                    id="emoji-btn"></i>
+                <i class="fa-regular fa-image chat-tool-btn"
+                    onclick="document.getElementById('chat-img-input').click()"></i>
+                <input type="file" id="chat-img-input" accept="image/*" style="display:none"
+                    onchange="app.chat.sendImage(this)">
+
+                <input type="text" class="c-input" id="chat-input" placeholder="说点什么... (支持@用户)"
+                    onkeydown="app.chat.handleKeyDown(event)">
+                <button class="c-btn" onclick="app.chat.sendText()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 独立的表情包选择器 -->
+    <div class="emoji-picker" id="emoji-picker">
+        <div class="emoji-grid" id="emoji-grid">
+            <!-- 表情包将通过JS动态生成 -->
+        </div>
+    </div>
+
+    <!-- 独立的消息操作菜单 -->
+    <div class="context-menu" id="msg-menu">
+        <div class="context-item" onclick="app.chat.quoteMessage()">💬 引用回复</div>
+        <div class="context-item" onclick="app.chat.deleteMessage()" id="msg-delete-btn">🗑️ 撤回消息</div>
+    </div>
+
+    <!-- 独立的管理菜单 -->
+    <div class="context-menu" id="admin-menu">
+        <div class="context-item" onclick="app.chat.adminAction('ban', prompt('请输入封禁理由'))">🚫 封禁用户</div>
+        <div class="context-item" onclick="app.chat.adminAction('set_vip', 30)">👑 赠送月卡</div>
+        <div class="context-item" onclick="app.chat.adminAction('set_vip', -1)">💎 赠送永久VIP</div>
+    </div>
+
+    <!-- 独立的个人菜单 -->
+    <div class="context-menu" id="self-menu">
+        <div class="context-item" onclick="app.chat.toggleNotify()">🔔 切换通知 (当前:<span id="notify-state">开</span>)
+        </div>
+        <div class="context-item" onclick="app.chat.updateProfile()">✏️ 修改资料</div>
+        <div class="context-item" onclick="app.chat.bindAccount()">🔗 绑定账号</div>
+    </div>
+
+    <!-- 底部输入栏 
+    <div class="comment-input-bar">
+        <input type="text" class="c-input" placeholder="善语结善缘，恶语伤人心">
+        <button class="c-btn">发送</button>
+    </div>
+    -->
+
+    <!-- 音乐页面 -->
+    <div class="page-layer" id="music-manage-page">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('music-manage-page')"><i
+                    class="fa-solid fa-chevron-left"></i></div>
+            <div class="header-title">音乐</div>
+            <div class="header-right"></div>
+        </div>
+        <div class="music-manage-container" id="music-manage-content">
+            <!-- 动态注入 -->
+        </div>
+    </div>
+
+    <!-- 通用占位页面 -->
+    <div class="page-layer" id="common-page" style="z-index: 105;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('common-page')"><i
+                    class="fa-solid fa-chevron-left"></i></div>
+            <div class="header-title" id="common-page-title">标题</div>
+            <div class="header-right"></div>
+        </div>
+        <div
+            style="display:flex;justify-content:center;align-items:center;height:80%;color:#666;flex-direction:column;">
+            <i class="fa-solid fa-person-digging" style="font-size:40px;margin-bottom:20px;"></i>
+            <span>功能开发中...</span>
+        </div>
+    </div>
+    <!-- 作品长按设置菜单 -->
+    <div class="comment-layer" id="work-settings-sheet">
+        <!-- 统一头部 -->
+        <div class="panel-header">
+            <!-- 左侧：关闭 -->
+            <div class="panel-left">
+                <div class="panel-icon-btn" onclick="app.menuManager.close()">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+            </div>
+            <!-- 中间：标题 -->
+            <div class="panel-title">作品设置</div>
+            <!-- 右侧：扩展/收缩 -->
+            <div class="panel-right">
+                <div class="panel-icon-btn expand-toggle-btn"
+                    onclick="app.pageManager.toggleLayerFullscreen('work-settings-sheet', this)">
+                    <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容容器 -->
+        <div class="settings-content-scroll">
+            <div class="ws-section-title">媒体信息</div>
+            <div class="media-status-card" id="ws-media-info">
+                <!-- 左侧图标/色块 -->
+                <div class="color-preview-circle" id="ws-info-icon-box">
+                    <i class="fa-solid fa-circle-info" id="ws-info-icon" style="font-size:24px; color:#fff;"></i>
+                </div>
+
+                <!-- 右侧文本详情 -->
+                <div class="media-info-text">
+                    <div class="mi-main" id="ws-info-main">获取中...</div>
+                    <div class="mi-sub" id="ws-info-sub">--</div>
+                    <!-- 新增：第三行详情（如下载大小等） -->
+                    <div class="mi-detail" id="ws-info-detail" style="font-size:11px; color:#666; margin-top:2px;">
+                        等待分析...</div>
+                </div>
+            </div>
+
+            <!-- 2. 倍速控制 -->
+
+            <div class="ws-section" id="ws-speed-section" style="display:none;">
+                <div class="ws-section-title">播放倍速</div>
+                <div class="speed-grid">
+
+                    <div class="glass-pill" onclick="app.menuManager.setSpeed(0.5)">0.5x</div>
+                    <div class="glass-pill active" id="btn-speed-1" onclick="app.menuManager.setSpeed(1.0)">1.0x
+                    </div>
+                    <div class="glass-pill" onclick="app.menuManager.setSpeed(1.5)">1.5x</div>
+                    <div class="glass-pill" onclick="app.menuManager.setSpeed(2.0)">2.0x</div>
+                </div>
+            </div>
+
+            <!-- 3. 通用功能网格 -->
+            <!-- 修改位置：work-settings-sheet 内的 action-grid -->
+            <div class="ws-section">
+                <div class="ws-section-title">常用操作</div>
+                <div class="action-grid">
+                    <!-- 1. 自动连播 -->
+                    <div class="glass-btn-square" onclick="app.menuManager.toggleAutoPlay(this)"
+                        id="btn-autoplay-toggle">
+                        <i class="fa-solid fa-infinity"></i>
+                        <span>自动连播</span>
+
+                    </div>
+                    <!-- 静音 -->
+                    <div class="glass-btn-square" onclick="app.menuManager.toggleMute(this)" id="btn-mute-toggle">
+                        <i class="fa-solid fa-volume-high"></i>
+                        <span>静音播放</span>
+
+                    </div>
+                    <!-- 2. 清屏模式 (新增) -->
+                    <div class="glass-btn-square" onclick="app.menuManager.toggleClearMode(this)"
+                        id="btn-clearmode-toggle">
+                        <i class="fa-solid fa-eye-slash"></i>
+                        <span>清屏模式</span>
+                    </div>
+                    <!-- 新增：收藏按钮 -->
+                    <div class="glass-btn-square" onclick="app.menuManager.toggleFavorite(this)"
+                        id="btn-favorite-toggle">
+                        <i class="fa-solid fa-star"></i>
+                        <span>收藏</span>
+                    </div>
+                    <!-- 3. 保存本地 (新增) -->
+                    <div class="glass-btn-square" onclick="app.menuManager.downloadCurrent()">
+                        <i class="fa-solid fa-download"></i>
+                        <span>保存本地</span>
+                    </div>
+
+                    <!-- 4. 复制链接 -->
+                    <div class="glass-btn-square" onclick="app.menuManager.shareCurrentWork()">
+                        <i class="fa-solid fa-link"></i> <!-- 图标换成 Link 更直观 -->
+                        <span>复制链接</span>
+                    </div>
+                    <div class="glass-btn-square" onclick="app.menuManager.triggerShareMenu()">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span>分享到</span>
+                    </div>
+                    <!-- 5. 重新加载 -->
+                    <div class="glass-btn-square" onclick="app.menuManager.reloadCurrent()">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>重新加载</span>
+                    </div>
+
+                    <!-- 6. 横屏观看 (仅横屏视频显示) -->
+                    <div class="glass-btn-square" id="btn-ws-landscape" style="display:none;"
+                        onclick="app.menuManager.triggerLandscape()">
+                        <i class="fa-solid fa-expand"></i>
+                        <span>横屏观看</span>
+                    </div>
+
+                    <!-- 7. 不感兴趣 (新增) -->
+                    <div class="glass-btn-square" onclick="app.menuManager.triggerDislike()">
+                        <i class="fa-regular fa-thumbs-down"></i>
+                        <span>不感兴趣</span>
+                    </div>
+
+                    <!-- 8. 举报 (新增) -->
+                    <div class="glass-btn-square" onclick="app.menuManager.triggerReport()">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>举报</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 下载/分享 Sheet -->
+    <div class="modal-sheet" id="download-sheet">
+        <div class="sheet-header">
+            <div class="sheet-back" onclick="history.back()"><i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="sheet-title">分享/下载</div>
+            <div class="sheet-select-all" id="btn-toggle-select">
+                <div class="dl-checkbox" id="select-all-indicator"
+                    style="position:static; border-color:#999; width:16px; height:16px; margin-right:4px;"></div> 全选
+            </div>
+        </div>
+        <div class="dl-grid-container">
+            <div class="dl-grid" id="dl-grid"></div>
+        </div>
+        <div class="dl-footer-panel">
+            <div class="gradient-btn btn-purple" id="btn-download-direct">
+                <div class="btn-icon"><i class="fa-solid fa-download"></i></div>
+                <div class="btn-text">直接下载</div>
+            </div>
+            <div class="gradient-btn btn-orange" id="btn-download-zip">
+                <div class="btn-icon"><i class="fa-solid fa-file-zipper"></i></div>
+                <div class="btn-text">资源打包</div>
+            </div>
+            <div class="gradient-btn btn-blue" id="btn-copy-links">
+                <div class="btn-icon"><i class="fa-solid fa-link"></i></div>
+                <div class="btn-text">复制选中链接</div>
+            </div>
+        </div>
+    </div>
+    <!-- 3. 我的页面 -->
+    <div class="page-layer" id="my-page">
+        <!-- 头部保持不变 -->
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('my-page')">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="header-title">我的</div>
+            <div class="header-right">
+                <i class="fa-solid fa-gear" style="font-size:20px; color:#fff; cursor:pointer;"
+                    onclick="app.pageManager.openSettings()"></i>
+            </div>
+        </div>
+
+        <!-- 我的页面头部 (位于 id="my-page" 内部) -->
+        <div class="my-profile-header">
+            <div class="my-profile-content">
+
+                <!-- 1. 头像区域 -->
+                <div class="my-avatar-container">
+                    <!-- ★★★ 修改点：添加 onclick 和 cursor:pointer ★★★ -->
+                    <img id="my-view-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Guest" alt="用户头像"
+                        onclick="app.unifiedAccount.openProfileEdit()" style="cursor: pointer;">
+
+                    <!-- 编辑/登录小图标 -->
+                    <div class="edit-profile-btn" onclick="app.unifiedAccount.openProfileEdit()">
+                        <i class="fa-solid fa-pen"></i>
+                    </div>
+                </div>
+
+                <!-- 2. 文字区域 (昵称和ID) -->
+                <!-- ★★★ 修改点：也添加 onclick，提升体验 ★★★ -->
+                <div class="my-info-text" onclick="app.unifiedAccount.openProfileEdit()" style="cursor: pointer;">
+                    <div class="my-nickname" id="my-view-name">未登录</div>
+                    <div class="my-id" id="my-view-id">点击头像登录</div>
+                </div>
+            </div>
+
+            <div class="my-stats-row">
+                <div class="stat-box">
+                    <span id="stat-likes">0</span>
+                    <label>喜欢</label>
+                </div>
+                <div class="stat-box">
+                    <span id="stat-favorites">0</span>
+                    <label>收藏</label>
+                </div>
+                <div class="stat-box">
+                    <span id="stat-music">0</span>
+                    <label>音乐</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 修改选项卡 -->
+        <div class="view-switch">
+            <div class="view-btn active" onclick="app.pageManager.switchMyTab('likes', this)">
+                喜欢
+            </div>
+            <div class="view-btn" onclick="app.pageManager.switchMyTab('favorites', this)">
+                收藏
+            </div>
+            <div class="view-btn" onclick="app.pageManager.switchMyTab('music', this)">
+                音乐
+            </div>
+        </div>
+
+        <!-- 找到这一段 -->
+        <div class="works-container" id="my-page-content">
+            <!-- 喜欢的内容网格 -->
+            <div class="works-grid" id="my-likes-grid"></div>
+
+            <!-- 收藏夹网格 (复用 Grid 样式) -->
+            <div class="my-list-container" id="my-favorites-grid"
+                style="display:none; padding: 0 10px;padding-bottom: 50px;"></div>
+
+            <!-- 音乐列表 -->
+            <div class="my-list-container" id="my-music-list" style="display:none;"></div>
+
+            <!-- 空状态提示 -->
+            <div id="my-empty-tip" style="display:none;">
+                <i class="fa-regular fa-folder-open"></i>
+                <div>暂无记录</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 设置页面 -->
+    <div class="page-layer" id="settings-page">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('settings-page')"><i
+                    class="fa-solid fa-chevron-left"></i></div>
+            <div class="header-title">设置</div>
+            <div class="header-right"></div>
+        </div>
+        <div class="settings-container">
+
+            <!-- 1. 播放体验 -->
+            <div class="settings-group-title">播放设置</div>
+            <div class="settings-group">
+                <!-- 全局自动连播 -->
+                <div class="setting-item">
+                    <div class="st-label">自动连播</div>
+                    <label class="st-switch">
+                        <input type="checkbox" id="cfg-auto-next"
+                            onchange="app.settingsManager.update('AUTO_NEXT_VIDEO', this.checked)">
+                        <span class="st-slider"></span>
+                    </label>
+                </div>
+                <!-- 默认静音 -->
+                <div class="setting-item">
+                    <div class="st-label">默认静音启动</div>
+                    <label class="st-switch">
+                        <input type="checkbox" id="cfg-muted"
+                            onchange="app.settingsManager.update('DEFAULT_MUTED', this.checked)">
+                        <span class="st-slider"></span>
+                    </label>
+                </div>
+                <!-- 默认倍速 -->
+                <div class="setting-item">
+                    <div class="st-label">默认播放倍速</div>
+                    <select class="st-select" id="cfg-speed"
+                        onchange="app.settingsManager.update('DEFAULT_SPEED', this.value)">
+                        <option value="0.5">0.5x</option>
+                        <option value="1.0" selected>1.0x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2.0">2.0x</option>
+                    </select>
+                </div>
+                <!-- 图集自动播放间隔 -->
+                <div class="setting-item">
+                    <div class="st-label">图集轮播间隔</div>
+                    <select class="st-select" id="cfg-gallery-delay"
+                        onchange="app.settingsManager.update('GALLERY_AUTOPLAY_DELAY', this.value)">
+                        <option value="1500">1.5秒</option>
+                        <option value="2000" selected>2.0秒</option>
+                        <option value="3000">3.0秒</option>
+                        <option value="5000">5.0秒</option>
+                        <option value="-1">关闭轮播</option>
+                    </select>
+                </div>
+                <!-- 新增：页面遮挡设置 -->
+                <div class="setting-item">
+                    <div class="st-label">离开首页时静音</div>
+                    <label class="st-switch">
+                        <input type="checkbox" id="cfg-mute-on-layer"
+                            onchange="app.settingsManager.update('MUTE_ON_PAGE_OPEN', this.checked)">
+                        <span class="st-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="st-label">离开首页时暂停</div>
+                    <label class="st-switch">
+                        <input type="checkbox" id="cfg-pause-on-layer"
+                            onchange="app.settingsManager.update('PAUSE_ON_PAGE_OPEN', this.checked)">
+                        <span class="st-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 2. 交互与反馈 -->
+            <div class="settings-group-title">交互与视觉</div>
+            <div class="settings-group">
+                <div class="setting-item">
+                    <div class="st-label">毛玻璃效果（开启可能会有卡顿）</div>
+                    <label class="st-switch">
+                        <!-- 默认是 checked (开启) -->
+                        <input type="checkbox" id="cfg-glass"
+                            onchange="app.settingsManager.update('ENABLE_GLASS', this.checked)">
+                        <span class="st-slider"></span>
+                    </label>
+                </div>
+                <!-- 原有的设置保持不变 -->
+                <div class="setting-item">
+                    <div class="st-label">震动反馈 (实验)</div>
+                    <label class="st-switch">
+                        <input type="checkbox" id="cfg-haptic"
+                            onchange="app.settingsManager.update('HAPTIC_FEEDBACK', this.checked)">
+                        <span class="st-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="st-label">单击暂停/播放</div>
+                    <label class="st-switch">
+                        <input type="checkbox" id="cfg-click-toggle"
+                            onchange="app.settingsManager.update('CLICK_TO_TOGGLE', this.checked)">
+                        <span class="st-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 3. 网络与性能 -->
+            <div class="settings-group-title">网络与性能</div>
+            <div class="settings-group">
+                <div class="setting-item">
+                    <div class="st-label">预加载力度</div>
+                    <select class="st-select" id="cfg-preload"
+                        onchange="app.settingsManager.update('PRELOAD_OFFSET', this.value)">
+                        <option value="1">省流 (仅下1个)</option>
+                        <option value="3" selected>标准 (下3个)</option>
+                        <option value="5">激进 (下5个)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <div class="st-label">单次加载数量</div>
+                    <select class="st-select" id="cfg-batch"
+                        onchange="app.settingsManager.update('BATCH_SIZE', this.value)">
+                        <option value="3">3条 (低配)</option>
+                        <option value="5" selected>5条 (标准)</option>
+                        <option value="10">10条 (高性能)</option>
+                    </select>
+                </div>
+            </div>
+            <!-- 下载设置 (积分版) -->
+            <div class="settings-group-title">下载管理</div>
+            <div class="settings-group">
+                <!-- 1. 剩余次数 -->
+                <div class="setting-item">
+                    <div class="st-label">剩余下载次数</div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="quota-display"
+                            style="color:var(--theme-color); font-weight:bold; font-size:16px;">0</span>
+                        <div class="glass-pill" style="height:28px; padding:0 10px; font-size:12px;"
+                            onclick="app.quotaManager.openTokenModal()">
+                            获取次数
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 打开下载中心 -->
+                <div class="setting-item clickable" onclick="app.pageManager.openDownloadCenter()">
+                    <div class="st-label">查看下载任务</div>
+                    <div style="display:flex; align-items:center; gap:5px; color:#666; font-size:12px;">
+                        <span id="active-task-count">0</span> 进行中
+                        <i class="fa-solid fa-angle-right st-arrow"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-group-title">存储管理</div>
+            <div class="settings-group">
+                <div class="setting-item clickable" onclick="app.dataSystem.open()">
+                    <div class="st-label">数据管理与更新</div>
+                    <i class="fa-solid fa-angle-right st-arrow"></i>
+                </div>
+                <div class="setting-item clickable" onclick="app.backupManager.openBackupPage()">
+                    <div class="st-label">数据备份与恢复</div>
+                    <!-- ... -->
+                </div>
+                <div class="setting-item">
+                    <div class="st-label">自动清理过期缓存 (7天)</div>
+                    <label class="st-switch">
+                        <input type="checkbox" id="cfg-auto-clean"
+                            onchange="app.settingsManager.update('AUTO_CLEAN_CACHE', this.checked)">
+                        <span class="st-slider"></span>
+                    </label>
+                </div>
+
+                <!-- 手动立即清理按钮 -->
+                <div class="setting-item clickable"
+                    onclick="app.autoCleaner.run(); app.interaction.showToast('清理检测完成');">
+                    <div class="st-label">立即执行清理</div>
+                    <i class="fa-solid fa-broom st-arrow"></i>
+                </div>
+            </div>
+            <!-- 4. 高级与数据 -->
+            <div class="settings-group-title">高级</div>
+            <div class="settings-group">
+                <div class="setting-item clickable" onclick="app.pageManager.openLogViewer()">
+                    <div class="st-label">运行日志与调试</div>
+                    <i class="fa-solid fa-angle-right st-arrow"></i>
+                </div>
+                <div class="setting-item clickable" onclick="app.pageManager.openDemoRoom()">
+                    <div class="st-label">实验室</div>
+                    <i class="fa-solid fa-angle-right st-arrow"></i>
+                </div>
+            </div>
+            <div class="settings-group-title">账号管理</div>
+            <div class="settings-group">
+                <!-- 1. 修改密码 -->
+                <div class="setting-item clickable" onclick="app.accountManager.openChangePassword()">
+                    <div class="st-label">修改密码</div>
+                    <i class="fa-solid fa-angle-right st-arrow"></i>
+                </div>
+
+                <!-- 2. 绑定邮箱 -->
+                <div class="setting-item clickable" onclick="app.accountManager.openBindEmail()">
+                    <div class="st-label">绑定邮箱</div>
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <span id="account-email-status" style="font-size:12px; color:#666;">未绑定</span>
+                        <i class="fa-solid fa-angle-right st-arrow"></i>
+                    </div>
+                </div>
+
+                <!-- 3. 账号安全 -->
+                <div class="setting-item clickable" onclick="app.accountManager.openSecuritySettings()">
+                    <div class="st-label">账号安全</div>
+                    <i class="fa-solid fa-angle-right st-arrow"></i>
+                </div>
+
+                <!-- 4. 退出登录 -->
+                <div class="setting-item clickable" onclick="app.accountManager.logout()">
+                    <div class="st-label" style="color:#ff4d4f;">退出登录</div>
+                    <i class="fa-solid fa-right-from-bracket" style="color:#ff4d4f;"></i>
+                </div>
+            </div>
+            <!-- 下载任务中心页面 -->
+            <div class="page-layer" id="download-center-page" style="z-index: 140;">
+                <div class="common-header">
+                    <div class="header-back" onclick="app.pageManager.closePage('download-center-page')"><i
+                            class="fa-solid fa-chevron-left"></i></div>
+                    <div class="header-title">下载中心</div>
+                    <div class="header-right" onclick="app.downloadMgr.clearFinishedTasks()">
+                        <i class="fa-solid fa-broom"></i>
+                    </div>
+                </div>
+
+                <!-- 新增：下载页面的 Tab 切换 -->
+                <div class="view-switch"
+                    style="margin: 0 15px 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <div class="view-btn active" onclick="app.downloadMgr.switchTab('active', this)">进行中</div>
+                    <div class="view-btn" onclick="app.downloadMgr.switchTab('history', this)">已完成</div>
+                </div>
+
+                <div style="flex:1; overflow-y:auto; position:relative;">
+                    <!-- 1. 进行中的任务列表 -->
+                    <div class="task-list" id="download-task-list">
+                        <!-- 动态生成任务 -->
+                    </div>
+
+                    <!-- 2. 历史记录列表 -->
+                    <div class="my-list-container" id="download-history-list" style="display:none; padding:10px;">
+                        <!-- 动态生成历史 -->
+                    </div>
+
+                    <div id="no-task-tip" style="text-align:center; padding:50px; color:#666; display:none;">
+                        <i class="fa-solid fa-list-check" style="font-size:40px; margin-bottom:10px;"></i>
+                        <div>暂无记录</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 口令输入弹窗 -->
+            <div id="token-modal-mask" class="overlay-mask" style="z-index: 199;"
+                onclick="app.quotaManager.closeTokenModal()"></div>
+            <div class="token-modal" id="token-modal">
+                <div style="text-align:center; font-weight:bold; font-size:18px;">增加下载次数</div>
+                <div style="text-align:center; color:#888; font-size:13px; margin-top:10px;">
+                    请前往 <span style="color:var(--theme-color); cursor:pointer;"
+                        onclick="window.open('https://link3.cc/liu13', '_blank')">任务页面</span> 获取口令
+                </div>
+                <input type="text" class="token-input" id="token-input-field" placeholder="输入口令">
+                <button class="submit-btn" onclick="app.quotaManager.verifyToken()">兑换</button>
+            </div>
+            <!-- 5. 关于 -->
+            <div class="settings-group-title">关于</div>
+            <div class="settings-group">
+                <!-- 免责声明 (保持不变) -->
+                <div class="setting-item clickable" onclick="app.pageManager.openTextPage('terms')">
+                    <div class="st-label">免责声明</div>
+                    <i class="fa-solid fa-angle-right st-arrow"></i>
+                </div>
+
+                <!-- 隐私政策 (保持不变) -->
+                <div class="setting-item clickable" onclick="app.pageManager.openTextPage('privacy')">
+                    <div class="st-label">隐私权限</div>
+                    <i class="fa-solid fa-angle-right st-arrow"></i>
+                </div>
+
+                <!-- 软件介绍 (保持不变) -->
+                <div class="setting-item clickable" onclick="app.pageManager.openTextPage('about')">
+                    <div class="st-label">软件介绍</div>
+                    <i class="fa-solid fa-angle-right st-arrow"></i>
+                </div>
+
+                <div class="setting-item clickable" onclick="DxxSystem.checkUpdate()">
+                    <div class="st-label">检查更新</div>
+
+                    <!-- 修改开始：添加一个右侧容器 -->
+                    <div style="display: flex; align-items: center;">
+                        <!-- 这里是版本号显示的容器，ID 为 sys-version-text -->
+                        <span id="sys-version-text" style="font-size: 12px; color: #666; margin-right: 8px;"></span>
+                        <i class="fa-solid fa-rotate st-arrow"></i>
+                    </div>
+                    <!-- 修改结束 -->
+
+                </div>
+
+                <!-- 【这里需要修改】关于软件 (弹窗) -->
+                <!-- 将 toAbout() 替换为 DxxSystem.openAbout() -->
+                <div class="setting-item clickable" onclick="DxxSystem.openAbout()">
+                    <div class="st-label">赞赏作者</div>
+                    <i class="fa-solid fa-angle-right st-arrow"></i>
+                </div>
+            </div>
+            <div class="settings-footer">
+                Powered by HTML5 & Swiper.js<br>
+                designed by Hillmis
+            </div>
+        </div>
+    </div>
+
+    <!-- 通用文本展示页 (用于协议、关于等) -->
+    <div class="page-layer" id="text-display-page" style="z-index: 120;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('text-display-page')"><i
+                    class="fa-solid fa-chevron-left"></i></div>
+            <div class="header-title" id="text-page-title">标题</div>
+            <div class="header-right"></div>
+        </div>
+        <div class="text-content-scroll">
+            <div class="text-body" id="text-page-body"></div>
+        </div>
+    </div>
+
+    <!-- 9. 开屏页 (Splash Screen) -->
+    <div id="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo">
+                <i class="fa fa-circle-nodes"></i>
+                <div class="splash-title">抖咻咻</div>
+            </div>
+            <div class="splash-slogan">分享美好</div>
+            <div class="splash-loader">
+                <div class="loader-bar"></div>
+            </div>
+            <div class="splash-footer">by Hillmis</div>
+        </div>
+    </div>
+
+    <!-- 隐私协议弹窗 (Privacy Modal) -->
+    <div id="startup-privacy-mask" class="overlay-mask" style="z-index: 9998;"></div>
+    <div id="startup-privacy-modal">
+        <div class="sp-header">服务协议与隐私保护</div>
+        <div class="sp-content">
+            <div class="sp-text">
+                欢迎使用抖咻咻！<br><br>
+                在您使用本产品之前，请您务必审慎阅读、充分理解
+                <span class="sp-link" onclick="app.pageManager.openTextPage('terms', true)">《用户协议》</span>和
+                <span class="sp-link" onclick="app.pageManager.openTextPage('privacy', true)">《隐私政策》</span>
+                的各条款内容。<br><br>
+                为了向您提供基础服务，我们需要获取您的本地存储权限以保存您的设置信息；麦克风权限仅在您使用“听歌识曲”功能时申请。<br><br>
+                如您同意以上协议内容，请点击“同意并继续”开始使用。
+            </div>
+        </div>
+        <div class="sp-footer">
+            <div class="sp-btn decline" onclick="alert('抱歉，若不同意相关协议，我们将无法为您提供服务。')">不同意</div>
+            <div class="sp-btn agree" onclick="app.startManager.agreeAndEnter()">同意并继续</div>
+        </div>
+    </div>
+
+    <!-- 11. 数据管理页面 (优化版) -->
+    <div class="page-layer" id="data-manager-page">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('data-manager-page')"><i
+                    class="fa-solid fa-chevron-left"></i></div>
+            <div class="header-title">存储与数据</div>
+            <!-- 右上角增加一键刷新 -->
+            <div class="header-right" onclick="app.dataSystem.refreshAllData()">
+                <i class="fa-solid fa-rotate-right" style="font-size:18px; color:#fff;"></i>
+            </div>
+        </div>
+
+        <!-- 1. 存储统计仪表盘 -->
+        <div class="dm-stats-card">
+            <div class="dm-chart-box">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <defs>
+                        <linearGradient id="gradient-color" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#5cc9ff; stop-opacity:1" /></stop>
+                            <stop offset="100%" style="stop-color:#b388eb; stop-opacity:1" /></stop>
+                        </lineargradient>
+                    </defs>
+                    <path class="circle-bg"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" /></path>
+                    <path class="circle" stroke-dasharray="0, 100"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" /></path>
+                </svg>
+                <div class="dm-percentage-text">0%</div>
+            </div>
+            <div class="dm-stats-info">
+                <div class="dm-info-row">
+                    <span class="dm-label">已用空间</span>
+                    <span class="dm-value dm-used">0 KB</span>
+                </div>
+                <div class="dm-info-row">
+                    <span class="dm-label">剩余可用</span>
+                    <span class="dm-value dm-free">5.0 MB</span>
+                </div>
+                <div class="dm-bar-bg">
+                    <div class="dm-bar-fill"></div>
+                </div>
+                <div class="dm-tips">本地存储使用indexDB</div>
+            </div>
+        </div>
+
+        <!-- 2. 分类切换与搜索 -->
+        <div class="dm-toolbar">
+            <div class="dm-tabs">
+                <div class="dm-tab active" onclick="app.dataSystem.switchTab('creators', this)">资源</div>
+                <div class="dm-tab" onclick="app.dataSystem.switchTab('downloads', this)">下载</div>
+                <div class="dm-tab" onclick="app.dataSystem.switchTab('system', this)">系统</div>
+            </div>
+            <!-- 搜索框 -->
+            <div class="dm-search-box" id="dm-search-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="dm-search-input" placeholder="搜索..."
+                    oninput="app.dataSystem.handleSearch(this.value)">
+            </div>
+        </div>
+
+        <!-- 3. 列表内容 -->
+        <div class="dm-list-container" id="dm-list-content">
+            <!-- 动态生成 -->
+        </div>
+
+        <!-- 4. 底部批量操作栏 (仅在资源Tab显示) -->
+        <div class="dm-footer-actions" id="dm-footer-creators">
+            <button class="dm-action-btn primary" onclick="app.dataSystem.updateAllCreators()">
+                <i class="fa-solid fa-rotate-right"></i> 更新全部数据
+            </button>
+        </div>
+        <div class="dm-footer-actions" id="dm-footer-downloads" style="display:none;">
+            <button class="dm-action-btn danger" onclick="app.dataSystem.clearDownloads()">
+                <i class="fa-solid fa-trash"></i> 清空所有记录
+            </button>
+        </div>
+    </div>
+
+    <!-- 应用日志查看页 -->
+    <div class="page-layer" id="log-viewer-page" style="z-index: 130;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('log-viewer-page')">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="header-title">运行日志</div>
+            <div class="header-right">
+                <i class="fa-solid fa-rotate-right" onclick="app.logger.renderLogs()"
+                    style="color:#fff; cursor:pointer;"></i>
+            </div>
+        </div>
+        <div class="log-container" id="log-list-container">
+            <!-- 日志内容动态生成 -->
+        </div>
+        <div class="log-footer-bar">
+            <button class="log-action-btn" onclick="app.logger.copyLogs()">
+                <i class="fa-solid fa-copy"></i> 复制全部
+            </button>
+            <button class="log-action-btn" style="background:#4a1818; color:#ff8888;" onclick="app.logger.clearLogs()">
+                <i class="fa-solid fa-trash"></i> 清空
+            </button>
+        </div>
+    </div>
+
+    <!-- 音乐胶囊拖动预览气泡 -->
+    <div id="scrub-preview-bubble" class="scrub-bubble">
+        <span id="scrub-time">00:45</span>
+    </div>
+    <!-- 搜索页面 -->
+    <div class="page-layer" id="search-page">
+        <!-- 搜索头部 -->
+        <div class="common-header" style="padding: 10px 15px; gap: 10px;">
+            <div class="header-back" onclick="app.pageManager.closePage('search-page')">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="dm-search-box" style="flex:1; height:36px; background:rgba(255,255,255,0.1);">
+                <i class="fa-solid fa-magnifying-glass" style="margin-left:10px;"></i>
+                <input type="text" id="global-search-input" placeholder="本地 / 联网搜索..." style="font-size:14px;"
+                    inputmode="search">
+                <i class="fa-solid fa-xmark" id="search-clear-btn" style="padding:10px; display:none;"
+                    onclick="app.searchManager.clearInput()"></i>
+            </div>
+            <div class="header-right" style="font-size:14px; font-weight:bold; color:var(--theme-color);"
+                onclick="app.searchManager.doSearch()">
+                搜索
+            </div>
+        </div>
+
+        <!-- 默认视图：包含轮播、历史、推荐、热榜 -->
+        <div id="search-default-view" class="settings-container">
+
+            <!-- 1. 轮播广告区 -->
+            <div class="search-banner-wrapper">
+                <div class="swiper search-banner-swiper">
+                    <div class="swiper-wrapper" id="search-banner-list">
+                        <!-- JS 动态注入 -->
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+
+            <!-- 2. 历史搜索 -->
+            <div id="search-history-section">
+                <div class="settings-group-title"
+                    style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>历史搜索</span>
+                    <i class="fa-solid fa-trash-can" style="cursor:pointer;"
+                        onclick="app.searchManager.clearHistory()"></i>
+                </div>
+                <div class="search-tags-container" id="search-history-tags">
+                    <!-- JS 动态生成 -->
+                </div>
+            </div>
+
+            <!-- 3. 推荐搜索 -->
+            <div class="settings-group-title">猜你想搜</div>
+            <div class="search-tags-container">
+                <div class="search-tag fire" onclick="app.searchManager.quickSearch('美女')"><i
+                        class="fa-solid fa-fire"></i> 美女</div>
+                <div class="search-tag" onclick="app.searchManager.quickSearch('风景')">风景</div>
+                <div class="search-tag" onclick="app.searchManager.quickSearch('情感')">情感</div>
+                <div class="search-tag" onclick="app.searchManager.quickSearch('4K')">4K</div>
+                <div class="search-tag" onclick="app.searchManager.quickSearch('游戏')">游戏</div>
+            </div>
+
+            <!-- 4. 抖音热榜 -->
+            <div class="hot-list-section">
+                <div class="settings-group-title"
+                    style="margin-top: 25px; margin-bottom: 10px; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-brands fa-hotjar" style="color: #ff4d4f;"></i> 热榜
+                    <span style="font-size:10px; color:#666; font-weight:normal; margin-left:auto;">刷新</span>
+                </div>
+                <!-- 热榜列表容器 -->
+                <div class="hot-list-card" id="hot-search-list">
+                    <!-- JS 动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果视图：Tab与列表 -->
+        <div id="search-result-view" style="display:none; height:calc(100% - 60px); flex-direction:column;">
+            <!-- 分类 Tab -->
+            <div class="view-switch" style="margin:0; padding:0 10px; flex-shrink:0;">
+                <div class="view-btn active" onclick="app.searchManager.switchTab('local-video', this)">本地视频</div>
+                <div class="view-btn" onclick="app.searchManager.switchTab('local-image', this)">本地图集</div>
+                <div class="view-btn" onclick="app.searchManager.switchTab('local-music', this)">本地音乐</div>
+                <div class="view-btn" onclick="app.searchManager.switchTab('online', this)">联网搜索</div>
+            </div>
+
+            <!-- 结果列表容器 -->
+            <div class="works-container" style="background:transparent;">
+                <div class="works-list" id="search-result-list" style="padding-top:10px;">
+                    <!-- 动态生成 -->
+                </div>
+                <!-- 加载状态 -->
+                <div id="search-loading" style="display:none; text-align:center; padding:20px; color:#666;">
+                    <i class="fa-solid fa-spinner fa-spin"></i> 正在全网搜索...
+                </div>
+                <!-- 空状态 -->
+                <div id="search-empty" style="display:none; text-align:center; padding:50px 0; color:#666;">
+                    <i class="fa-solid fa-box-open" style="font-size:40px; margin-bottom:10px;"></i>
+                    <div>未找到相关内容</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 1. 新增：选择收藏夹弹窗 (Bottom Sheet) -->
+    <div class="modal-sheet" id="fav-select-sheet" style="z-index: 160;">
+        <div class="sheet-header">
+            <div class="sheet-back" onclick="app.favManager.closeSheet()">
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="sheet-title">选择收藏夹</div>
+            <div class="sheet-right" onclick="app.favManager.openCreateModal()">
+                <i class="fa-solid fa-plus"></i> 新建
+            </div>
+        </div>
+        <div class="dl-grid-container" style="padding: 0;">
+            <!-- 文件夹列表 -->
+            <div class="my-list-container" id="fav-select-list"></div>
+        </div>
+    </div>
+
+    <!-- 2. 新增：收藏夹详情页 (Page Layer) -->
+    <div class="page-layer" id="fav-detail-page" style="z-index: 110;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('fav-detail-page')">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="header-title" id="fav-detail-title">默认收藏</div>
+            <div class="header-right" id="fav-detail-actions">
+                <!-- 动态生成删除按钮 -->
+            </div>
+        </div>
+        <div class="works-container">
+            <div class="works-grid" id="fav-detail-grid">
+                <!-- 动态生成作品 -->
+            </div>
+            <div id="fav-empty-tip" style="display:none; text-align:center; padding:50px; color:#666;">
+                <i class="fa-regular fa-folder-open" style="font-size:40px; margin-bottom:10px;"></i>
+                <div>暂无收藏内容</div>
+            </div>
+        </div>
+    </div>
+    <!-- 新建收藏夹弹窗 (居中弹窗) -->
+    <div class="overlay-mask" id="create-folder-mask" style="z-index: 200;"></div>
+    <div class="token-modal" id="create-folder-modal" style="z-index: 201; display: none;">
+        <div style="text-align:center; font-weight:bold; font-size:18px; margin-bottom:15px;">新建收藏夹</div>
+
+        <input type="text" class="token-input" id="new-folder-name" placeholder="请输入收藏夹名称"
+            style="text-align:left; padding-left:15px;">
+
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="sp-btn decline" onclick="app.favManager.closeCreateModal()">取消</button>
+            <button class="sp-btn agree" onclick="app.favManager.confirmCreate()">创建</button>
+        </div>
+    </div>
+    <!-- 任务5：账号资料编辑弹窗 -->
+    <div class="overlay-mask" id="profile-edit-mask" style="z-index: 200;"></div>
+    <div class="token-modal" id="profile-edit-modal" style="z-index: 201; display: none;">
+        <div style="text-align:center; font-weight:bold; font-size:18px; margin-bottom:20px;">编辑资料</div>
+
+        <div class="input-group">
+            <label class="input-label">昵称</label>
+            <input type="text" class="custom-input" id="edit-nick" placeholder="设置昵称">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">展示ID</label>
+            <input type="text" class="custom-input" id="edit-uid" placeholder="例如: hillmis@qq.com">
+        </div>
+
+        <div class="input-group" style="display:flex; flex-direction:column; align-items:center; margin-bottom:20px;">
+            <label class="input-label" style="align-self:flex-start;">头像</label>
+
+            <div style="position: relative; width: 80px; height: 80px; margin-top:10px;">
+                <!-- 头像预览 -->
+                <img id="edit-avatar-preview" src=""
+                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); background: #333;">
+
+                <!-- 相机图标 (点击触发文件选择) -->
+                <div onclick="document.getElementById('edit-avatar-file').click()"
+                    style="position: absolute; bottom: 0; right: 0; background: var(--theme-color); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                    <i class="fa-solid fa-camera" style="font-size: 12px; color: #000;"></i>
+                </div>
+            </div>
+
+            <!-- 隐藏的文件输入框 -->
+            <input type="file" id="edit-avatar-file" accept="image/*" style="display: none;"
+                onchange="app.userDataManager.handleAvatarFile(this)">
+
+            <!-- 隐藏的文本框 (用于存储 Base64 或 URL，兼容旧逻辑) -->
+            <input type="hidden" id="edit-avatar">
+
+            <div style="font-size:12px; color:#666; margin-top:8px;">点击图标上传本地图片</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="sp-btn decline" onclick="app.userDataManager.closeEditModal()">取消</button>
+            <button class="sp-btn agree" onclick="app.userDataManager.saveProfile()">保存</button>
+        </div>
+    </div>
+
+    <!-- 修改 onclick，传入 true 表示“直接打开” -->
+    <div id="download-float-btn" onclick="app.pageManager.openDownloadCenter(true)">
+        <div class="df-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+        <div class="df-text">下载中</div>
+        <div class="df-badge" id="df-badge-count">0</div>
+    </div>
+
+    <!-- 登录/注册弹窗 (修正版) -->
+    <div class="overlay-mask" id="auth-mask" style="z-index: 200;"></div>
+    <div class="token-modal" id="login-modal" style="z-index: 201; display: none;">
+        <!-- 关闭按钮 -->
+        <div style="position:absolute; top:15px; right:15px; color:#999; font-size:20px; cursor:pointer;"
+            onclick="app.accountManager.closeModal()">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+
+        <div style="text-align:center; font-weight:bold; font-size:18px; margin-bottom:25px; color:#fff;"
+            id="login-title">
+            账号登录
+        </div>
+
+        <!-- 登录表单 -->
+        <div id="login-form-view">
+            <div class="input-group" style="margin-bottom:15px;">
+                <!-- 注意 id="auth-user" -->
+                <input type="text" class="custom-input" id="auth-user" placeholder="请输入用户名" style="width:100%;">
+            </div>
+            <div class="input-group" style="margin-bottom:20px;">
+                <!-- 注意 id="auth-pass" -->
+                <input type="password" class="custom-input" id="auth-pass" placeholder="请输入密码" style="width:100%;">
+            </div>
+            <button class="submit-btn" onclick="app.accountManager.doLogin()">立即登录</button>
+        </div>
+
+        <!-- 注册表单 -->
+        <div id="register-form-view" style="display:none;">
+            <div class="input-group" style="margin-bottom:15px;">
+                <input type="text" class="custom-input" id="reg-email" placeholder="设置用户名" style="width:100%;">
+            </div>
+            <div class="input-group" style="margin-bottom:15px;">
+                <input type="password" class="custom-input" id="reg-pwd" placeholder="设置密码" style="width:100%;">
+            </div>
+            <div class="input-group" style="margin-bottom:20px;">
+                <input type="password" class="custom-input" id="reg-pwd2" placeholder="确认密码" style="width:100%;">
+            </div>
+            <button class="submit-btn" onclick="app.accountManager.doRegister()">注册并登录</button>
+        </div>
+
+        <div style="text-align:center; margin-top:20px; font-size:13px; color:#888;" id="auth-switch-text">
+            没有账号？ <span onclick="app.accountManager.switchView('register')"
+                style="cursor:pointer; color:var(--theme-color);">立即注册</span>
+        </div>
+    </div>
+    <input type="file" id="backup-import-input" accept=".json" style="display:none;"
+        onchange="app.backupManager.handleFileImport(this)">
+    <!-- 新增：数据备份与恢复独立页面 -->
+    <div class="page-layer" id="backup-page" style="z-index: 130;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('backup-page')">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="header-title">备份与恢复</div>
+            <div class="header-right"></div>
+        </div>
+
+        <div class="settings-container">
+            <!-- 1. 顶部状态卡片 -->
+            <div class="backup-status-card">
+                <div class="bs-icon"><i class="fa-solid fa-cloud"></i></div>
+                <div class="bs-info">
+                    <div class="bs-title">云端账号</div>
+                    <div class="bs-desc" id="backup-cloud-status">检测中...</div>
+                </div>
+                <div class="bs-btn" onclick="app.accountManager.openModal()" id="backup-login-btn">登录</div>
+                <div class="bs-btn" onclick="app.accountManager.logout()" id="backup-logout-btn"
+                    style="display:none; background:#ff4d4f;">退出</div>
+            </div>
+
+            <!-- 2. 数据范围选择 (开关) -->
+            <div class="settings-group-title">数据开关 (决定备份/恢复的范围)</div>
+            <div class="backup-options-grid">
+                <div class="bo-item active" onclick="app.backupManager.toggleOption('settings', this)">
+                    <i class="fa-solid fa-sliders"></i> 全局设置
+                </div>
+                <div class="bo-item active" onclick="app.backupManager.toggleOption('user_profile', this)">
+                    <i class="fa-solid fa-user-circle"></i> 个人资料
+                </div>
+                <div class="bo-item active" onclick="app.backupManager.toggleOption('creators', this)">
+                    <i class="fa-solid fa-users"></i> 资源数据
+                </div>
+                <div class="bo-item active" onclick="app.backupManager.toggleOption('favorites', this)">
+                    <i class="fa-solid fa-star"></i> 收藏夹
+                </div>
+                <div class="bo-item active" onclick="app.backupManager.toggleOption('likes', this)">
+                    <i class="fa-solid fa-heart"></i> 喜欢列表
+                </div>
+                <div class="bo-item active" onclick="app.backupManager.toggleOption('music', this)">
+                    <i class="fa-solid fa-music"></i> 音乐库
+                </div>
+                <div class="bo-item" onclick="app.backupManager.toggleOption('downloads', this)">
+                    <i class="fa-solid fa-download"></i> 下载记录
+                </div>
+            </div>
+
+            <!-- 3. 核心操作区 -->
+            <div class="settings-group-title">数据操作</div>
+
+            <!-- 一键同步大按钮 -->
+            <div class="sync-card" onclick="app.backupManager.startSmartSync()">
+                <div class="sc-left">
+                    <div class="sc-title">一键智能同步</div>
+                    <div class="sc-desc">云端/本地双向对比与合并</div>
+                </div>
+                <div class="sc-icon"><i class="fa-solid fa-rotate"></i></div>
+            </div>
+
+            <div class="backup-grid">
+                <!-- 导出 -->
+                <div class="backup-card" onclick="app.backupManager.exportToFile()">
+                    <div class="bc-icon color-blue"><i class="fa-solid fa-file-export"></i></div>
+                    <div class="bc-name">导出文件</div>
+                </div>
+                <!-- 导入 -->
+                <div class="backup-card" onclick="document.getElementById('backup-import-input-page').click()">
+                    <div class="bc-icon color-green"><i class="fa-solid fa-file-import"></i></div>
+                    <div class="bc-name">导入文件</div>
+                </div>
+                <!-- 云备份 -->
+                <div class="backup-card" onclick="app.backupManager.backupToCloud()">
+                    <div class="bc-icon color-purple"><i class="fa-solid fa-cloud-upload"></i></div>
+                    <div class="bc-name">云端备份</div>
+                </div>
+                <!-- 云恢复 -->
+                <div class="backup-card" onclick="app.backupManager.restoreFromCloud()">
+                    <div class="bc-icon color-orange"><i class="fa-solid fa-cloud-download"></i></div>
+                    <div class="bc-name">云端恢复</div>
+                </div>
+            </div>
+            <!-- 隐藏的文件输入框 -->
+            <input type="file" id="backup-import-input-page" accept=".json" style="display:none;"
+                onchange="app.backupManager.handleFileImport(this)">
+
+            <!-- 4. 本地快照 (历史配置) -->
+            <div class="settings-group-title" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>本地快照</span>
+                <div class="glass-pill" style="
+        height: 24px; 
+        font-size: 11px; 
+        padding: 0 10px;
+        margin-left: 5px;
+        min-width: 60px;
+    " onclick="app.backupManager.createSnapshot()">
+                    <i class="fa-solid fa-plus" style="margin-right: 4px;"></i>创建
+                </div>
+            </div>
+            <div class="backup-history-list" id="backup-snapshot-container">
+                <!-- 动态生成快照 -->
+            </div>
+
+            <!-- 5. 操作日志 -->
+            <div class="settings-group-title" style="display:flex; justify-content:space-between; margin-top:20px;">
+                <span>操作日志</span>
+                <span style="font-size:12px; color:#666; cursor:pointer;"
+                    onclick="app.backupManager.clearHistory()">清空</span>
+            </div>
+            <div class="backup-history-list" id="backup-history-container"></div>
+            <div style="height:50px;"></div>
+        </div>
+    </div>
+
+    <!-- 新增：资源管理页面 -->
+    <div class="page-layer" id="resource-manage-page" style="z-index: 110;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('resource-manage-page')">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="header-title">管理资源</div>
+            <div class="header-right">
+                <!-- 改为图标按钮 -->
+                <i class="fa-solid fa-trash-can" style="font-size:18px; color:#ff4d4f; cursor:pointer; padding:10px;"
+                    onclick="app.resourceManager.deleteCurrentResource()" title="删除整个资源合集">
+                </i>
+            </div>
+        </div>
+
+        <div class="settings-container">
+            <!-- 1. 基本信息编辑 -->
+            <div class="settings-group-title">基本信息</div>
+            <div class="settings-group" style="padding:15px;">
+                <div class="input-group" style="margin-bottom:15px;">
+                    <label class="input-label">资源名称 (重命名)</label>
+                    <input type="text" class="custom-input" id="rm-name-input">
+                </div>
+
+                <!-- 新增：头像链接输入框 -->
+                <div class="input-group" style="margin-bottom:15px;">
+                    <label class="input-label">头像链接 (可选)</label>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <!-- 头像预览小图 -->
+                        <img id="rm-avatar-preview" src=""
+                            style="width:40px; height:40px; border-radius:50%; object-fit:cover; background:#333; flex-shrink:0;">
+                        <input type="text" class="custom-input" id="rm-avatar-input" placeholder="输入图片URL，留空使用默认">
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-bottom:15px;">
+                    <label class="input-label">数据源链接</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" class="custom-input" id="rm-url-input" placeholder="无链接 (本地导入)">
+                        <button class="c-btn" style="width:80px;" onclick="app.resourceManager.saveInfo()">保存</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">数据操作</label>
+                    <div style="display:flex; gap:10px;">
+                        <button class="dm-action-btn primary" style="height:36px; font-size:13px;"
+                            onclick="app.resourceManager.triggerUpdate()">
+                            <i class="fa-solid fa-rotate"></i> 立即联网更新
+                        </button>
+                        <button class="dm-action-btn" style="height:36px; font-size:13px; background:#333;"
+                            onclick="app.resourceManager.exportData()">
+                            <i class="fa-solid fa-file-export"></i> 导出备份
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 内容管理 -->
+            <div class="settings-group-title" style="display:flex; justify-content:space-between;">
+                <span>内容管理</span>
+                <span id="rm-count-badge" style="color:#666; font-size:12px;">0 个作品</span>
+            </div>
+
+            <!-- 改为 list 布局 -->
+            <div class="works-list" id="rm-works-grid" style="padding-bottom:50px; padding-top:10px;">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. 圈子主页 (集成新版 UI) -->
+    <div class="page-layer" id="circle-page">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('circle-page')"><i
+                    class="fa-solid fa-chevron-left"></i></div>
+            <div class="header-title" id="circle-page-title">圈子</div>
+            <div class="header-right" onclick="app.incentiveManager.openTaskModal()">
+                <i class="fa-solid fa-gift" style="color: #fbbf24;"></i>
+            </div>
+        </div>
+
+        <div class="settings-container" id="circle-scroll-view"
+            style="padding: 15px; position: relative; height: calc(100% - 60px);">
+
+            <!-- 1. 顶部用户信息卡 (保留原有功能) -->
+            <div class="circle-header-card" onclick="app.unifiedAccount.openProfileEdit()" style="margin: 0 0 20px 0;">
+                <img id="circle-user-avatar" src=""
+                    style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+                <div style="flex:1;">
+                    <div id="circle-user-name" style="font-size:16px; font-weight:bold; color:#fff;">未登录</div>
+                    <div id="circle-user-hid" style="font-size:11px; color:#aaa;">HID: --</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:18px; color:#fbbf24; font-weight:bold;"><i class="fa-solid fa-coins"></i>
+                        <span id="circle-user-coins">0</span>
+                    </div>
+                    <div style="font-size:10px; color:#aaa;">硬币</div>
+                </div>
+            </div>
+
+            <!-- 2. 热门推荐 (Hero Grid) -->
+            <h3 style="margin-bottom:12px; font-size:16px; color:#fff;">热门圈子</h3>
+            <div class="hero-grid" id="circle-hero-container">
+                <!-- JS 动态渲染 -->
+            </div>
+
+            <!-- 3. 更多圈子 (Icon Grid) -->
+            <h3 style="margin-bottom:12px; font-size:16px; color:#fff;">更多圈子</h3>
+            <div class="circles-panel">
+                <div class="icon-grid" id="circles-icon-grid">
+                    <!-- JS 动态渲染 -->
+                </div>
+            </div>
+
+            <!-- 4. 筛选 Tab -->
+            <div class="circle-tab-bar" id="circle-tab-bar">
+                <div class="circle-tab-item active" onclick="app.circleManager.switchTab('all', this)">最新</div>
+                <div class="circle-tab-item" onclick="app.circleManager.switchTab('essence', this)">精华</div>
+                <div class="circle-tab-item" onclick="app.circleManager.switchTab('resource', this)">资源</div>
+            </div>
+
+            <!-- 5. 帖子列表容器 -->
+            <div id="circle-feed-container" style="padding-bottom: 80px; min-height: 200px;">
+                <!-- 动态生成帖子 -->
+            </div>
+
+            <!-- 悬浮发布按钮 -->
+            <div class="fab-post" onclick="app.circleManager.openPostModal()">
+                <i class="fa-solid fa-pen-nib"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 统一资料修改/账号管理弹窗 -->
+    <div class="page-layer" id="account-manage-page" style="z-index: 140;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('account-manage-page')"><i
+                    class="fa-solid fa-chevron-left"></i></div>
+            <div class="header-title">账号管理</div>
+        </div>
+        <div class="settings-container">
+            <div class="settings-group-title">基本资料</div>
+            <div class="settings-group">
+                <div class="input-group" style="padding:15px;">
+                    <label class="input-label">头像 URL</label>
+                    <input type="text" class="custom-input" id="acc-avatar-input">
+                </div>
+                <div class="input-group" style="padding:0 15px 15px;">
+                    <label class="input-label">昵称</label>
+                    <input type="text" class="custom-input" id="acc-nick-input">
+                </div>
+                <div class="input-group" style="padding:0 15px 15px;">
+                    <label class="input-label">个性签名</label>
+                    <input type="text" class="custom-input" id="acc-sign-input">
+                </div>
+                <div class="padding:15px;">
+                    <button class="submit-btn" onclick="app.unifiedAccount.saveProfile()">保存资料</button>
+                </div>
+            </div>
+
+            <div class="settings-group-title">云端与安全</div>
+            <div class="settings-group">
+                <div class="setting-item clickable" onclick="app.unifiedAccount.openLanzouConfig()">
+                    <div class="st-label">蓝奏云备份设置</div>
+                    <i class="fa-solid fa-cloud st-arrow"></i>
+                </div>
+                <div class="setting-item clickable" onclick="app.unifiedAccount.resetPasswordTrigger()">
+                    <div class="st-label">找回/修改密码</div>
+                    <div style="font-size:12px; color:#666;">通过邮箱</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 任务与权益弹窗 -->
+    <div class="modal-sheet" id="task-sheet" style="z-index:160;">
+        <div class="sheet-header">
+            <!-- 修改此处：改为 history.back() -->
+            <div class="sheet-back" onclick="history.back()">
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="sheet-title">任务中心</div>
+            <div class="sheet-right" style="font-size:12px; color:#fbbf24;">
+                余额: <span id="task-coin-balance">0</span>
+            </div>
+        </div>
+        <div class="dl-grid-container" style="padding:15px;">
+            <div class="settings-group-title">权益兑换</div>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <div class="glass-pill active" onclick="app.incentiveManager.buyQuota('download')"
+                    style="flex:1; padding:10px;">
+                    <div style="font-size:12px;">下载次数 +5</div>
+                    <div style="font-size:14px;margin-left: 10px; font-weight:bold; color:#fbbf24;">10 硬币</div>
+                </div>
+                <div class="glass-pill active" onclick="app.incentiveManager.buyQuota('backup')"
+                    style="flex:1; padding:10px;">
+                    <div style="font-size:12px;">备份次数 +1</div>
+                    <div style="font-size:14px;margin-left: 10px; font-weight:bold; color:#fbbf24;">20硬币</div>
+                </div>
+            </div>
+
+            <div class="settings-group-title">每日任务</div>
+            <div id="daily-task-list">
+                <!-- JS 生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 帖子发布弹窗 (已美化，统一风格) -->
+    <div class="page-layer" id="post-create-page" style="z-index: 150;">
+        <!-- 1. 头部：保持透明背景和标准高度 -->
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('post-create-page')">
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="header-title">发布帖子</div>
+            <div class="header-right">
+                <!-- 发布按钮：纸飞机图标 -->
+                <div class="send-button" onclick="app.circleManager.submitPost()" title="发送/发布">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 内容区域：使用 settings-container 样式，确保支持滚动且不被头部遮挡 -->
+        <!-- 增加 padding-top 防止内容顶格 -->
+        <div class="settings-container" style="padding-top: 20px;">
+
+            <!-- 标题输入 -->
+            <input type="text" class="custom-input" id="post-title-input" placeholder="加个标题会让更多人看到 (可选)"
+                style="margin-bottom:15px; font-weight:bold; font-size:16px;">
+            <!-- 圈子选择 (新增，完善功能) -->
+            <div class="settings-group-title">选择圈子</div>
+            <div class="settings-group">
+                <div class="setting-item">
+                    <div class="st-label">发布到</div>
+                    <select class="st-select" id="post-circle-select" style="max-width: 150px;">
+                        <!-- JS 会自动填充选项 -->
+                        <option value="1">默认圈子</option>
+                    </select>
+                </div>
+            </div>
+            <!-- 内容输入 -->
+            <textarea class="custom-input" id="post-content-input" placeholder="分享你的想法... (支持粘贴链接)"
+                style="height:150px; resize:none; line-height:1.5; margin-bottom:20px;"></textarea>
+
+            <!-- 媒体添加区 -->
+            <div class="settings-group-title">添加媒体</div>
+            <div class="settings-group" style="padding:15px;">
+                <div id="post-media-list">
+                    <!-- 这里的布局会被 JS renderMediaPreview 覆盖/填充 -->
+                    <div class="input-group" style="display:flex; gap:10px; align-items:center;">
+                        <div class="glass-btn-square" style="width:60px; height:60px;"
+                            onclick="app.circleManager.addMediaInput()">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <span style="font-size:12px; color:#888;">点击添加图片 (支持多选)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部留白，防止被全面屏手势条遮挡 -->
+            <div style="height: 50px;"></div>
+        </div>
+    </div>
+
+    <!-- 圈子详情页 (新增) -->
+    <div class="page-layer" id="circle-detail-page" style="z-index: 120;">
+        <div class="common-header" style="background:transparent; position:absolute; top:0; width:100%; z-index:10;">
+            <div class="header-back" onclick="app.pageManager.closePage('circle-detail-page')">
+                <i class="fa-solid fa-arrow-left"></i>
+            </div>
+            <div class="header-right"></div>
+        </div>
+
+        <!-- 顶部 Banner 信息 -->
+        <div id="cd-bg" style="height:200px; background-size:cover; background-position:center; position:relative;">
+            <div
+                style="position:absolute; bottom:0; left:0; width:100%; padding:20px; background:linear-gradient(to top, #121212, transparent);">
+                <div id="cd-title" style="font-size:24px; font-weight:bold;">圈子名称</div>
+                <div id="cd-desc" style="font-size:12px; color:#ccc; margin-top:5px;">圈子描述...</div>
+            </div>
+        </div>
+
+        <!-- 帖子列表 -->
+        <div class="settings-container" style="height:calc(100% - 200px); padding-top:10px;">
+            <div id="cd-post-list">
+                <!-- 动态加载 -->
+            </div>
+        </div>
+    </div>
+    <!-- 创建圈子弹窗 (请确保这段代码在 body 内) -->
+    <div class="overlay-mask" id="create-circle-mask" style="z-index: 200;"></div>
+    <div class="token-modal" id="create-circle-modal" style="z-index: 201; display: none;">
+        <div style="text-align:center; font-weight:bold; font-size:18px; margin-bottom:20px; color:#fff;">
+            创建新圈子
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">圈子名称</label>
+            <input type="text" class="custom-input" id="new-circle-name" placeholder="例如: 摄影角" maxlength="5">
+        </div>
+        <div class="input-group">
+            <label class="input-label">简介 (选填)</label>
+            <input type="text" class="custom-input" id="new-circle-desc" placeholder="一句话描述这个圈子" maxlength="20">
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="sp-btn decline" onclick="app.circleManager.closeCreateCircleModal()">取消</button>
+            <button class="sp-btn agree" onclick="app.circleManager.submitCreateCircle()">立即创建</button>
+        </div>
+    </div>
+
+    <!-- 新版豪华打赏弹窗 -->
+    <div class="overlay-mask" id="reward-mask" style="z-index: 200;"></div>
+    <div class="token-modal" id="reward-modal" style="z-index: 201; display: none;">
+        <!-- 头部图标 -->
+        <div class="reward-header-icon">
+            <i class="fa-solid fa-gift" style="font-size:28px; color:#fff;"></i>
+        </div>
+
+        <div style="text-align:center; margin-bottom:20px;">
+            <div style="font-size:18px; font-weight:bold; color:#fff; letter-spacing:1px;">支持创作者</div>
+            <div style="font-size:12px; color:#888; margin-top:5px;">赠送硬币，为优质内容喝彩</div>
+        </div>
+
+        <!-- 选项网格 -->
+        <div class="reward-grid">
+            <div class="reward-item" onclick="app.circleManager.selectReward(5, this)">
+                <span>5</span> <label>支持你</label>
+            </div>
+            <div class="reward-item" onclick="app.circleManager.selectReward(10, this)">
+                <span>10</span> <label>点个赞</label>
+            </div>
+            <div class="reward-item" onclick="app.circleManager.selectReward(20, this)">
+                <span>20</span> <label>请喝水</label>
+            </div>
+            <div class="reward-item" onclick="app.circleManager.selectReward(50, this)">
+                <span>50</span> <label>加鸡腿</label>
+            </div>
+            <div class="reward-item" onclick="app.circleManager.selectReward(100, this)">
+                <span>100</span> <label>超喜欢</label>
+            </div>
+            <div class="reward-item" onclick="app.circleManager.selectReward(520, this)">
+                <span>520</span> <label>真爱粉</label>
+            </div>
+            <!-- 自定义金额框 -->
+            <div class="reward-custom-box">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <input type="number" id="reward-custom-input" class="reward-custom-input" placeholder="自定义数量"
+                    oninput="app.circleManager.clearRewardSelection()">
+            </div>
+        </div>
+
+        <button class="reward-confirm-btn" onclick="app.circleManager.confirmReward()">立即打赏</button>
+
+        <div style="text-align:center; margin-top:20px; font-size:12px; color:#666; cursor:pointer;"
+            onclick="app.circleManager.closeRewardModal()">
+            下次一定
+        </div>
+    </div>
+    <!-- 圈子管理页 -->
+    <div class="page-layer" id="circle-manage-page" style="z-index: 130;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('circle-manage-page')">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="header-title">圈子管理</div>
+        </div>
+
+        <div class="settings-container">
+            <div class="settings-group-title">基本信息</div>
+            <div class="settings-group" style="padding:15px;">
+                <div class="input-group">
+                    <label class="input-label">圈子名称</label>
+                    <input type="text" class="custom-input" id="manage-circle-name" maxlength="5" placeholder="最多5个字">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">简介</label>
+                    <input type="text" class="custom-input" id="manage-circle-desc">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">背景图 URL</label>
+                    <input type="text" class="custom-input" id="manage-circle-bg">
+                </div>
+                <button class="submit-btn" onclick="app.circleManager.updateCircleInfo()">保存修改</button>
+            </div>
+
+            <div class="settings-group-title">危险操作</div>
+            <div class="settings-group">
+                <div class="setting-item clickable" onclick="app.circleManager.disbandCircle()">
+                    <div class="st-label" style="color:#ff4d4f;">解散圈子</div>
+                    <i class="fa-solid fa-triangle-exclamation" style="color:#ff4d4f;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增：圈子用户个人主页 -->
+    <div class="page-layer" id="circle-user-profile-page" style="z-index: 125;">
+        <div class="common-header">
+            <div class="header-back" onclick="app.pageManager.closePage('circle-user-profile-page')">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <div class="header-title">用户主页</div>
+            <div class="header-right">
+                <!-- 如果是自己，显示编辑按钮 -->
+                <i class="fa-solid fa-pen-to-square" id="cup-edit-btn" style="display:none;"
+                    onclick="app.unifiedAccount.openProfileEdit()"></i>
+            </div>
+        </div>
+
+        <div class="settings-container" style="padding: 0; background: #121212;">
+            <!-- 顶部个人信息卡 -->
+            <div class="cup-header">
+                <img id="cup-bg" class="cup-bg-blur" src="">
+                <div class="cup-info-box">
+                    <div class="cup-avatar-row">
+                        <img id="cup-avatar" src="" class="cup-avatar">
+                        <div class="cup-stats">
+                            <div class="cup-stat-item">
+                                <span id="cup-stat-posts">0</span>
+                                <label>帖子</label>
+                            </div>
+                            <div class="cup-stat-item">
+                                <span id="cup-stat-circles">0</span>
+                                <label>圈子</label>
+                            </div>
+                            <div class="cup-stat-item">
+                                <span id="cup-stat-coins">0</span>
+                                <label>硬币</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cup-text-row">
+                        <div class="cup-name" id="cup-name">加载中...</div>
+                        <div class="cup-sign" id="cup-sign">暂无个性签名</div>
+                        <div class="cup-tags" id="cup-role-tags"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 选项卡 -->
+            <div class="view-switch" style="position: sticky; top: 0; z-index: 10; background: #121212; margin: 0;">
+                <div class="view-btn active" onclick="app.circleManager.switchUserTab('posts', this)">动态</div>
+                <div class="view-btn" onclick="app.circleManager.switchUserTab('circles', this)">圈子</div>
+                <div class="view-btn" onclick="app.circleManager.switchUserTab('likes', this)">喜欢</div>
+                <!-- 仅查看自己时显示硬币明细 -->
+                <div class="view-btn" id="cup-tab-coins" style="display:none;"
+                    onclick="app.circleManager.switchUserTab('coins', this)">明细</div>
+            </div>
+
+            <!-- 内容列表容器 -->
+            <div id="cup-content-list" style="padding-bottom: 50px; min-height: 300px;">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+    <!-- //////////////
+        外部js库加载开始 
+    //////////////////-->
+
+    <!-- Swiper: 核心轮播库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"
+        onerror="document.write('<script src=\'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js\'><\/script>')"></script>
+
+    <!-- JSZip: 压缩打包库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+        onerror="document.write('<script src=\'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js\'><\/script>')"></script>
+
+    <!-- FileSaver: 文件保存库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"
+        onerror="document.write('<script src=\'https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js\'><\/script>')"></script>
+
+    <!-- ★★★ LocalForage: 解决存储报错的关键库 ★★★ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"
+        onerror="document.write('<script src=\'https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js\'><\/script>')"></script>
+
+    
+    <script src="./scripts/common/init.js"></script>
+
+    
+
+    <!-- //////////////
+        外部js库加载结束
+    //////////////////-->
+    <!-- 引入 API 模块 -->
+    <script src="./scripts/modules/api.js"></script>
+    <script src="./scripts/modules/aboutUpdate5.3.js"></script>
+    
+    <script src="./scripts/pages/main.js"></script>
+
+</body>
+
+</html>

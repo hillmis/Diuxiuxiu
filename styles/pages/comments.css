@@ -1,0 +1,9 @@
+/* 确保评论区不影响其他页面 */
+    .comment-layer {
+        z-index: 99 !important;
+    }
+
+    /* 修复点击事件穿透 */
+    .overlay-mask.active {
+        z-index: 99 !important;
+    }
